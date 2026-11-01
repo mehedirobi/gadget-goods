@@ -4,356 +4,288 @@ import { Link } from "react-router";
 import {
   ArrowLeft,
   ArrowRight,
-  Clock3,
+  ArrowUpRight,
   Sparkles,
-  ShieldCheck,
-  Truck,
   Zap,
 } from "lucide-react";
+
+const SLIDE_INTERVAL = 4000;
 
 const slides = [
   {
     id: 1,
-    label: "Limited Time Offer",
-    category: "Exclusive Deal",
-    title: "Upgrade Your",
-    highlight: "Gaming Experience.",
+    eyebrow: "THE NEXT LEVEL OF GAMING",
+    badge: "EXCLUSIVE DEAL",
+    title: "Power Up Your",
+    highlight: "Gaming World.",
     description:
-      "Experience next-level gaming with powerful performance, premium accessories, and incredible deals.",
-    productName: "Premium Gaming Setup",
-    oldPrice: "৳45,000",
-    newPrice: "৳34,999",
-    discount: "22% OFF",
-    image:
-      "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85",
-    imageAlt: "Premium gaming setup",
-    buttonText: "Shop Gaming Gear",
+      "Build your ultimate gaming setup with powerful hardware, immersive displays, and premium gaming accessories.",
+    product: "Gaming Collection",
+    offer: "UP TO 30% OFF",
+    price: "Starting at ৳2,499",
+    buttonText: "Explore Gaming",
     link: "/shop?category=gaming",
-    badgeIcon: Zap,
-    theme: "from-blue-600/20 to-cyan-500/5",
+    image:
+      "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=2000&q=85",
+    imagePosition: "center",
   },
   {
     id: 2,
-    label: "Just Arrived",
-    category: "New Arrival",
-    title: "Discover the",
-    highlight: "Latest Technology.",
+    eyebrow: "TECHNOLOGY MEETS INNOVATION",
+    badge: "NEW ARRIVALS",
+    title: "Experience the",
+    highlight: "Future Today.",
     description:
-      "Explore the latest smartphones with stunning displays, powerful cameras, and advanced performance.",
-    productName: "Latest Smartphones",
-    oldPrice: "৳85,000",
-    newPrice: "৳72,999",
-    discount: "15% OFF",
-    image:
-      "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1200&q=85",
-    imageAlt: "Latest premium smartphone",
-    buttonText: "Explore Smartphones",
+      "Discover the latest smartphones with exceptional cameras, stunning displays, and powerful performance.",
+    product: "Latest Smartphones",
+    offer: "NEW COLLECTION",
+    price: "Explore the latest models",
+    buttonText: "Discover Phones",
     link: "/shop?category=smartphones",
-    badgeIcon: Sparkles,
-    theme: "from-violet-600/20 to-blue-500/5",
+    image:
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=2000&q=85",
+    imagePosition: "center",
   },
   {
     id: 3,
-    label: "Coming Soon",
-    category: "Upcoming Product",
-    title: "Something",
-    highlight: "Powerful Is Coming.",
+    eyebrow: "BUILT FOR YOUR PRODUCTIVITY",
+    badge: "PREMIUM COLLECTION",
+    title: "Work Smarter.",
+    highlight: "Go Further.",
     description:
-      "Get ready for the next generation of computing. Stay updated with upcoming premium laptops and devices.",
-    productName: "Next-Gen Laptop",
-    oldPrice: null,
-    newPrice: "Coming Soon",
-    discount: "NEW RELEASE",
-    image:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=85",
-    imageAlt: "Premium laptop",
-    buttonText: "Explore Collection",
+      "Find your perfect laptop for creativity, productivity, business, and everything in between.",
+    product: "Premium Laptops",
+    offer: "SPECIAL PRICES",
+    price: "Explore laptop collection",
+    buttonText: "Explore Laptops",
     link: "/shop?category=laptops",
-    badgeIcon: Clock3,
-    theme: "from-cyan-600/20 to-blue-500/5",
+    image:
+      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=2000&q=85",
+    imagePosition: "center",
   },
   {
     id: 4,
-    label: "Special Discount",
-    category: "Hot Deal",
-    title: "Make Every Moment",
-    highlight: "Sound Better.",
+    eyebrow: "SOUND WITHOUT LIMITS",
+    badge: "LIMITED TIME OFFER",
+    title: "Feel Every",
+    highlight: "Beat.",
     description:
-      "Enjoy immersive audio with premium headphones designed for music lovers, gamers, and professionals.",
-    productName: "Premium Headphones",
-    oldPrice: "৳12,000",
-    newPrice: "৳8,999",
-    discount: "25% OFF",
-    image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
-    imageAlt: "Premium wireless headphones",
-    buttonText: "Explore Audio Gear",
+      "Discover premium headphones and audio accessories designed to bring every detail to life.",
+    product: "Premium Audio",
+    offer: "UP TO 25% OFF",
+    price: "Selected audio products",
+    buttonText: "Explore Audio",
     link: "/shop?category=accessories",
-    badgeIcon: Zap,
-    theme: "from-indigo-600/20 to-purple-500/5",
+    image:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=2000&q=85",
+    imagePosition: "center",
   },
 ];
 
-const AUTO_SLIDE_INTERVAL = 2500;
-
 const Hero = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [progressKey, setProgressKey] = useState(0);
 
   const activeSlide = slides[activeIndex];
-  const BadgeIcon = activeSlide.badgeIcon;
 
   const nextSlide = () => {
     setActiveIndex((current) => (current + 1) % slides.length);
-    setProgressKey((current) => current + 1);
   };
 
   const previousSlide = () => {
     setActiveIndex(
       (current) => (current - 1 + slides.length) % slides.length
     );
-    setProgressKey((current) => current + 1);
   };
 
   const goToSlide = (index) => {
     setActiveIndex(index);
-    setProgressKey((current) => current + 1);
   };
 
+  // Preload the next image to reduce transition flicker.
   useEffect(() => {
-    if (isPaused) return;
+    const nextIndex = (activeIndex + 1) % slides.length;
+    const image = new Image();
 
-    const interval = setInterval(() => {
+    image.src = slides[nextIndex].image;
+  }, [activeIndex]);
+
+  // Autoplay continues during hover and resets after manual navigation.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
-      setProgressKey((current) => current + 1);
-    }, AUTO_SLIDE_INTERVAL);
+    }, SLIDE_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [isPaused]);
+    return () => clearTimeout(timeout);
+  }, [activeIndex]);
 
   return (
     <section
-      className="relative overflow-hidden bg-[#080f1d] text-white"
-      aria-label="Featured promotions"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onFocusCapture={() => setIsPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
-          setIsPaused(false);
-        }
-      }}
+      aria-label="Featured products and promotions"
+      className="relative isolate mx-auto overflow-hidden bg-[#080d18]"
     >
-      {/* Background effects */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-10 h-96 w-96 rounded-full bg-blue-600/10 blur-[120px]" />
-        <div className="absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-cyan-500/10 blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:28px_28px]" />
+      {/* Background image */}
+      <div className="absolute inset-0 -z-20">
+        <img
+          key={activeSlide.id}
+          src={activeSlide.image}
+          alt=""
+          fetchPriority={activeIndex === 0 ? "high" : "auto"}
+          className="h-full w-full object-cover animate-[heroImage_700ms_ease-out]"
+          style={{ objectPosition: activeSlide.imagePosition }}
+        />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:px-8 lg:py-20">
+      {/* Subtle overlays - image remains clearly visible */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#080d18]/95 via-[#080d18]/75 to-[#080d18]/10" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#080d18]/75 via-transparent to-[#080d18]/10" />
 
-        {/* Carousel */}
-        <div className="relative min-h-[570px] sm:min-h-[560px] lg:min-h-[490px]">
+      {/* Main content */}
+      <div className="relative mx-auto flex min-h-[440px] max-w-[1440px] items-center px-16 pb-24 pt-12 sm:min-h-[460px] sm:px-20 sm:pb-24 lg:min-h-[420px] lg:px-28 lg:py-12">
+        <div
+          key={activeSlide.id}
+          className="w-full max-w-[590px] animate-[heroContent_500ms_ease-out]"
+        >
+          {/* Badge */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-3.5 py-2 text-[10px] font-bold tracking-[0.14em] text-blue-300 backdrop-blur-sm sm:text-xs">
+              <Sparkles size={14} />
+              {activeSlide.badge}
+            </span>
 
-          {/* Slide content */}
-          <div
-            key={activeSlide.id}
-            className="grid min-h-[570px] items-center gap-12 animate-[fadeIn_500ms_ease-in-out] sm:min-h-[560px] lg:min-h-[490px] lg:grid-cols-2"
-          >
-            {/* Left content */}
-            <div className="relative z-10 flex flex-col items-start">
+            <span className="text-[10px] font-semibold tracking-[0.16em] text-gray-300 sm:text-xs">
+              {activeSlide.eyebrow}
+            </span>
+          </div>
 
-              {/* Category badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-300">
-                <BadgeIcon size={16} />
-                {activeSlide.label}
-              </div>
+          {/* Heading */}
+          <h1 className="mt-6 text-4xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-5xl lg:text-[58px]">
+            {activeSlide.title}
+            <span className="mt-1 block bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+              {activeSlide.highlight}
+            </span>
+          </h1>
 
-              <p className="mt-7 text-xs font-semibold uppercase tracking-[0.25em] text-blue-400">
-                {activeSlide.category}
-              </p>
+          {/* Description */}
+          <p className="mt-5 max-w-[490px] text-sm leading-7 text-gray-300 sm:text-base">
+            {activeSlide.description}
+          </p>
 
-              {/* Heading */}
-              <h1 className="mt-4 text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
-                {activeSlide.title}
-                <span className="mt-2 block bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                  {activeSlide.highlight}
-                </span>
-              </h1>
+          {/* Offer */}
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <span className="inline-flex items-center gap-2 rounded-lg border border-blue-400/25 bg-blue-500/15 px-4 py-2.5 text-xs font-bold tracking-wide text-white backdrop-blur-sm">
+              <Zap size={16} className="text-cyan-300" />
+              {activeSlide.offer}
+            </span>
 
-              <p className="mt-6 max-w-xl text-sm leading-7 text-gray-400 sm:text-base sm:leading-8">
-                {activeSlide.description}
-              </p>
+            <span className="text-sm font-medium text-gray-200">
+              {activeSlide.price}
+            </span>
+          </div>
 
-              {/* Product pricing */}
-              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-                <div>
-                  <p className="text-xs text-gray-500">
-                    Featured Product
-                  </p>
-                  <p className="mt-1 font-semibold text-white">
-                    {activeSlide.productName}
-                  </p>
-                </div>
-
-                <div className="h-9 w-px bg-gray-700" />
-
-                <div>
-                  {activeSlide.oldPrice && (
-                    <p className="text-sm text-gray-500 line-through">
-                      {activeSlide.oldPrice}
-                    </p>
-                  )}
-                  <p className="text-2xl font-bold text-blue-400">
-                    {activeSlide.newPrice}
-                  </p>
-                </div>
-
-                <span className="rounded-md bg-red-500/15 px-3 py-1.5 text-xs font-bold text-red-400">
-                  {activeSlide.discount}
-                </span>
-              </div>
-
-              {/* CTA buttons */}
-              <div className="mt-9 flex flex-wrap items-center gap-4">
-                <Link
-                  to={activeSlide.link}
-                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080f1d]"
-                >
-                  {activeSlide.buttonText}
-                  <ArrowRight size={18} />
-                </Link>
-
-                <Link
-                  to="/shop"
-                  className="rounded-lg border border-gray-700 px-6 py-3.5 text-sm font-semibold text-gray-200 transition hover:border-blue-400 hover:text-blue-400"
-                >
-                  View All Products
-                </Link>
-              </div>
-
-              {/* Trust indicators */}
-              <div className="mt-10 flex flex-wrap gap-x-7 gap-y-4 text-xs text-gray-400 sm:text-sm">
-                <div className="flex items-center gap-2">
-                  <Truck size={17} className="text-blue-400" />
-                  Fast Delivery
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <ShieldCheck size={17} className="text-blue-400" />
-                  Genuine Products
-                </div>
-              </div>
-            </div>
-
-            {/* Right image */}
-            <div className="relative mx-auto w-full max-w-xl">
-              <div
-                className={`absolute inset-8 rounded-full bg-gradient-to-br ${activeSlide.theme} blur-3xl`}
+          {/* Buttons */}
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Link
+              to={activeSlide.link}
+              className="group inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500"
+            >
+              {activeSlide.buttonText}
+              <ArrowUpRight
+                size={17}
+                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               />
+            </Link>
 
-              <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-3 shadow-2xl sm:p-5">
-                <img
-                  src={activeSlide.image}
-                  alt={activeSlide.imageAlt}
-                  fetchPriority="high"
-                  className="aspect-[4/3] w-full rounded-2xl object-cover"
-                />
-
-                {/* Discount floating card */}
-                <div className="absolute right-6 top-6 rounded-xl border border-white/10 bg-[#080f1d]/90 px-4 py-3 shadow-xl backdrop-blur-md">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
-                    Special Offer
-                  </p>
-                  <p className="mt-1 text-lg font-extrabold text-blue-400">
-                    {activeSlide.discount}
-                  </p>
-                </div>
-
-                {/* Bottom product label */}
-                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between rounded-xl border border-white/10 bg-[#080f1d]/90 p-4 backdrop-blur-md">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-gray-400">
-                      Gadget Goods Featured
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-white">
-                      {activeSlide.productName}
-                    </p>
-                  </div>
-
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400">
-                    <Sparkles size={20} />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Link
+              to="/shop"
+              className="inline-flex items-center rounded-lg border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/10"
+            >
+              Browse Products
+            </Link>
           </div>
 
-          {/* Carousel controls */}
-          <div className="absolute bottom-0 left-0 z-20 flex w-full items-center justify-between gap-4 lg:bottom-1">
-
-            {/* Pagination */}
-            <div className="flex items-center gap-2">
-              {slides.map((slide, index) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  onClick={() => goToSlide(index)}
-                  aria-label={`Go to slide ${index + 1}: ${slide.category}`}
-                  aria-current={activeIndex === index ? "true" : undefined}
-                  className={`relative h-1.5 overflow-hidden rounded-full transition-all duration-300 ${
-                    activeIndex === index
-                      ? "w-10 bg-blue-500"
-                      : "w-5 bg-gray-600 hover:bg-gray-400"
-                  }`}
-                >
-                  {activeIndex === index && !isPaused && (
-                    <span
-                      key={progressKey}
-                      className="absolute inset-y-0 left-0 bg-cyan-300 animate-[slideProgress_2500ms_linear_forwards]"
-                    />
-                  )}
-                </button>
-              ))}
-
-              <span className="ml-2 text-xs text-gray-500">
-                {String(activeIndex + 1).padStart(2, "0")} /{" "}
-                {String(slides.length).padStart(2, "0")}
-              </span>
-            </div>
-
-            {/* Navigation */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={previousSlide}
-                aria-label="Previous slide"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 bg-white/5 text-white transition hover:border-blue-400 hover:bg-blue-600"
-              >
-                <ArrowLeft size={18} />
-              </button>
-
-              <button
-                type="button"
-                onClick={nextSlide}
-                aria-label="Next slide"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 bg-white/5 text-white transition hover:border-blue-400 hover:bg-blue-600"
-              >
-                <ArrowRight size={18} />
-              </button>
-            </div>
+          {/* Product label */}
+          <div className="mt-6 flex items-center gap-2 text-xs text-gray-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+            Featured: {activeSlide.product}
           </div>
+        </div>
+      </div>
+
+      {/* Left navigation */}
+      <button
+        type="button"
+        onClick={previousSlide}
+        aria-label="Previous promotion"
+        className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-md transition hover:border-blue-400 hover:bg-blue-600 sm:left-5 sm:h-12 sm:w-12"
+      >
+        <ArrowLeft size={19} />
+      </button>
+
+      {/* Right navigation */}
+      <button
+        type="button"
+        onClick={nextSlide}
+        aria-label="Next promotion"
+        className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-md transition hover:border-blue-400 hover:bg-blue-600 sm:right-5 sm:h-12 sm:w-12"
+      >
+        <ArrowRight size={19} />
+      </button>
+
+      {/* Bottom centered pill pagination */}
+      <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
+        <div className="flex items-center gap-3 rounded-full border border-white/15 bg-[#080d18]/75 px-4 py-2.5 shadow-xl backdrop-blur-xl">
+          <span className="text-xs font-semibold tabular-nums text-white">
+            {String(activeIndex + 1).padStart(2, "0")}
+          </span>
+
+          {/* Progress indicators */}
+          <div className="flex items-center gap-1.5">
+            {slides.map((slide, index) => (
+              <button
+                key={slide.id}
+                type="button"
+                onClick={() => goToSlide(index)}
+                aria-label={`Go to promotion ${index + 1}`}
+                aria-current={activeIndex === index ? "true" : undefined}
+                className={`relative h-1.5 overflow-hidden rounded-full transition-all duration-300 ${
+                  activeIndex === index
+                    ? "w-8 bg-white/25"
+                    : "w-1.5 bg-white/35 hover:bg-white/70"
+                }`}
+              >
+                {activeIndex === index && (
+                  <span
+                    key={activeIndex}
+                    className="absolute inset-0 origin-left rounded-full bg-blue-400 animate-[heroProgress_4000ms_linear]"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <span className="text-xs font-medium tabular-nums text-gray-400">
+            {String(slides.length).padStart(2, "0")}
+          </span>
         </div>
       </div>
 
       {/* Animation styles */}
       <style>{`
-        @keyframes fadeIn {
+        @keyframes heroImage {
+          from {
+            opacity: 0.75;
+            transform: scale(1.015);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes heroContent {
           from {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(12px);
           }
           to {
             opacity: 1;
@@ -361,18 +293,19 @@ const Hero = () => {
           }
         }
 
-        @keyframes slideProgress {
+        @keyframes heroProgress {
           from {
-            width: 0%;
+            transform: scaleX(0);
           }
           to {
-            width: 100%;
+            transform: scaleX(1);
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .animate-\\[fadeIn_500ms_ease-in-out\\],
-          .animate-\\[slideProgress_2500ms_linear_forwards\\] {
+          .animate-\\[heroImage_700ms_ease-out\\],
+          .animate-\\[heroContent_500ms_ease-out\\],
+          .animate-\\[heroProgress_4000ms_linear\\] {
             animation: none !important;
           }
         }

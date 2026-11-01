@@ -1,9 +1,5 @@
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <div>hi there</div>
-  )
+  return null;
 }
 
-export default App
+export default App;
