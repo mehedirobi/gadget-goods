@@ -1,9 +1,9 @@
-const App = () => {
-  return (
-    <div>
-      <h1>Gadget Goods</h1>
-    </div>
-  );
-};
+function App() {
+  const [count, setCount] = useState(0)
 
-export default App;
+  return (
+    <div>hi there</div>
+  )
+}
+
+export default App
