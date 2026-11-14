@@ -11,7 +11,6 @@ import {
 
 const SLIDE_INTERVAL = 4000;
 
-
 const slides = [
   {
     id: 1,
@@ -82,6 +81,7 @@ const slides = [
     imagePosition: "center",
   },
 ];
+
 
 const Hero = () => {
   const [activeIndex, setActiveIndex] = useState(0);
