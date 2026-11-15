@@ -1,10 +1,11 @@
-import { Link } from "react-router";
 
+import { Link } from "react-router";
 import {
   Mail,
   Phone,
   MapPin,
   ArrowRight,
+  ArrowUpRight,
 } from "lucide-react";
 
 import {
@@ -49,37 +50,39 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="border-t border-gray-800 bg-[#080d19] text-gray-400">
+    <footer className="border-t border-gray-200 bg-white text-gray-600">
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Main Footer */}
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:gap-12 lg:px-8 lg:py-16">
 
         {/* Brand Section */}
         <div>
           <Link
             to="/"
-            className="text-2xl font-bold tracking-tight text-white"
+            aria-label="Gadget Goods home"
+            className="inline-flex text-2xl font-extrabold tracking-tight text-gray-950"
           >
-            Gadget<span className="text-blue-500">Goods</span>.
+            Gadget<span className="text-blue-600">Goods</span>
+            <span className="text-blue-600">.</span>
           </Link>
 
-          <p className="mt-4 max-w-xs text-sm leading-7">
-            Discover premium electronics and innovative gadgets.
-            Upgrade your digital world with quality products and
-            reliable service.
+          <p className="mt-4 max-w-xs text-sm leading-7 text-gray-600">
+            Discover quality electronics and innovative gadgets.
+            Find the right technology to upgrade your everyday life.
           </p>
 
           {/* Social Links */}
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex items-center gap-3">
             {socialLinks.map(({ name, icon: Icon, url }) => (
               <a
                 key={name}
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={name}
-                className="rounded-lg bg-gray-800 p-2.5 transition-all duration-300 hover:-translate-y-1 hover:bg-blue-600 hover:text-white"
+                aria-label={`Visit Gadget Goods on ${name}`}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-600 transition-colors duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
-                <Icon size={18} />
+                <Icon size={17} />
               </a>
             ))}
           </div>
@@ -87,16 +90,16 @@ const Footer = () => {
 
         {/* Quick Links */}
         <div>
-          <h3 className="mb-5 text-lg font-semibold text-white">
+          <h3 className="mb-5 text-sm font-bold uppercase tracking-wider text-gray-950">
             Quick Links
           </h3>
 
-          <ul className="space-y-3 text-sm">
+          <ul className="space-y-3">
             {quickLinks.map((link) => (
               <li key={link.path}>
                 <Link
                   to={link.path}
-                  className="transition-colors duration-200 hover:text-blue-400"
+                  className="inline-flex text-sm text-gray-600 transition-colors duration-200 hover:text-blue-700"
                 >
                   {link.name}
                 </Link>
@@ -107,16 +110,16 @@ const Footer = () => {
 
         {/* Customer Support */}
         <div>
-          <h3 className="mb-5 text-lg font-semibold text-white">
+          <h3 className="mb-5 text-sm font-bold uppercase tracking-wider text-gray-950">
             Customer Support
           </h3>
 
-          <ul className="space-y-3 text-sm">
+          <ul className="space-y-3">
             {supportLinks.map((link) => (
               <li key={link.path}>
                 <Link
                   to={link.path}
-                  className="transition-colors duration-200 hover:text-blue-400"
+                  className="inline-flex text-sm text-gray-600 transition-colors duration-200 hover:text-blue-700"
                 >
                   {link.name}
                 </Link>
@@ -127,59 +130,72 @@ const Footer = () => {
 
         {/* Contact Information */}
         <div>
-          <h3 className="mb-5 text-lg font-semibold text-white">
+          <h3 className="mb-5 text-sm font-bold uppercase tracking-wider text-gray-950">
             Contact Us
           </h3>
 
-          <ul className="space-y-4 text-sm">
-
+          <ul className="space-y-4">
             <li className="flex items-start gap-3">
               <MapPin
-                size={19}
-                className="mt-1 shrink-0 text-blue-500"
+                size={18}
+                className="mt-0.5 shrink-0 text-blue-600"
               />
-              <span>Dhaka, Bangladesh</span>
+              <span className="text-sm leading-6 text-gray-600">
+                Dhaka, Bangladesh
+              </span>
             </li>
 
             <li className="flex items-center gap-3">
               <Phone
-                size={18}
-                className="shrink-0 text-blue-500"
+                size={17}
+                className="shrink-0 text-blue-600"
               />
-              <span>+8801336458100</span>
+              <a
+                href="tel:+8801336458100"
+                className="text-sm text-gray-600 transition-colors hover:text-blue-700"
+              >
+                +8801336458100
+              </a>
             </li>
 
             <li className="flex items-center gap-3">
               <Mail
-                size={18}
-                className="shrink-0 text-blue-500"
+                size={17}
+                className="shrink-0 text-blue-600"
               />
-              <span>support@gadgetgoods.com</span>
+              <a
+                href="mailto:support@gadgetgoods.com"
+                className="break-all text-sm text-gray-600 transition-colors hover:text-blue-700"
+              >
+                support@gadgetgoods.com
+              </a>
             </li>
-
           </ul>
 
           <Link
             to="/contact"
-            className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-blue-400 transition-colors hover:text-blue-300"
+            className="group mt-6 inline-flex items-center gap-2 text-sm font-bold text-blue-700 transition-colors hover:text-blue-800"
           >
             Get in touch
-            <ArrowRight size={16} />
+            <ArrowRight
+              size={16}
+              className="transition-transform duration-200 group-hover:translate-x-1"
+            />
           </Link>
         </div>
-
       </div>
 
       {/* Bottom Footer */}
-      <div className="border-t border-gray-800">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-center text-xs sm:flex-row sm:text-left">
+      <div className="border-t border-gray-200 bg-gray-50">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-center sm:flex-row sm:px-6 sm:text-left lg:px-8">
 
-          <p>
+          <p className="text-xs font-medium text-gray-500">
             © {new Date().getFullYear()} Gadget Goods. All rights reserved.
           </p>
 
-          <p>
+          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500">
             Upgrade Your Digital World.
+            <ArrowUpRight size={13} className="text-blue-600" />
           </p>
 
         </div>

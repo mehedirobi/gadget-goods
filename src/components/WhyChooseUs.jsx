@@ -2,73 +2,80 @@
 import {
   ShieldCheck,
   Truck,
-  Headphones,
-  RefreshCcw,
+  Headset,
+  RefreshCw,
 } from "lucide-react";
 
 const benefits = [
   {
     icon: ShieldCheck,
     title: "100% Genuine Products",
-    description: "Shop confidently with authentic products and trusted brands.",
+    description:
+      "Shop with confidence knowing every product is authentic and quality-checked.",
   },
   {
     icon: Truck,
     title: "Fast & Secure Delivery",
-    description: "Get your favorite gadgets delivered safely to your doorstep.",
+    description:
+      "Enjoy reliable delivery with your gadgets carefully handled at every step.",
   },
   {
-    icon: RefreshCcw,
-    title: "Easy Returns",
-    description: "A straightforward return process for eligible purchases.",
+    icon: RefreshCw,
+    title: "Hassle-Free Returns",
+    description:
+      "Experience a simple and convenient return process on eligible purchases.",
   },
   {
-    icon: Headphones,
-    title: "Customer Support",
-    description: "Our support team is here to help with your shopping needs.",
+    icon: Headset,
+    title: "Dedicated Support",
+    description:
+      "Get expert assistance whenever you need help with your shopping experience.",
   },
 ];
 
 const WhyChooseUs = () => {
   return (
-    <section className="bg-[#080d19] px-6 py-20">
+    <section className="bg-gray-50 px-4 py-16 sm:px-6 lg:py-20">
       <div className="mx-auto max-w-7xl">
-
+        {/* Section Heading */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-blue-400">
+          <span className="inline-block rounded-full bg-blue-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-blue-600">
             The Gadget Goods Difference
-          </p>
+          </span>
 
-          <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Why Shop With Us?
           </h2>
 
-          <p className="mt-4 text-gray-400">
-            Quality products, reliable service and a better shopping experience.
+          <p className="mt-4 text-sm leading-7 text-gray-500 sm:text-base">
+            More than just gadgets. We deliver quality products,
+            dependable service, and a shopping experience you can trust.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Benefits Grid */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {benefits.map(({ icon: Icon, title, description }) => (
-            <div
+            <article
               key={title}
-              className="rounded-2xl border border-gray-800 bg-[#111827] p-7 text-center transition hover:border-blue-500/50"
+              className="group flex flex-col items-center rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5"
             >
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
-                <Icon size={27} />
+              {/* Icon */}
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-colors duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                <Icon size={26} strokeWidth={1.8} />
               </div>
 
-              <h3 className="mt-5 font-semibold text-white">
+              {/* Content */}
+              <h3 className="mt-5 text-base font-semibold text-gray-900">
                 {title}
               </h3>
 
-              <p className="mt-3 text-sm leading-7 text-gray-400">
+              <p className="mt-3 text-sm leading-6 text-gray-500">
                 {description}
               </p>
-            </div>
+            </article>
           ))}
         </div>
-
       </div>
     </section>
   );
