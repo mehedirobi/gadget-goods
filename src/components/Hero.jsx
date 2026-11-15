@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import {
@@ -7,6 +6,7 @@ import {
   ArrowUpRight,
   Sparkles,
   Zap,
+  ShoppingBag,
 } from "lucide-react";
 
 const SLIDE_INTERVAL = 4000;
@@ -14,20 +14,21 @@ const SLIDE_INTERVAL = 4000;
 const slides = [
   {
     id: 1,
-    eyebrow: "THE NEXT LEVEL OF GAMING",
+    eyebrow: "LEVEL UP YOUR GAMING",
     badge: "EXCLUSIVE DEAL",
     title: "Power Up Your",
     highlight: "Gaming World.",
     description:
-      "Build your ultimate gaming setup with powerful hardware, immersive displays, and premium gaming accessories.",
-    product: "Gaming Collection",
+      "Discover powerful gaming gear, immersive displays, and premium accessories built to elevate every gaming session.",
     offer: "UP TO 30% OFF",
-    price: "Starting at ৳2,499",
+    price: "On selected gaming products",
     buttonText: "Explore Gaming",
     link: "/shop?category=gaming",
     image:
-      "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=2000&q=85",
+      "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85",
+    imageAlt: "Modern gaming setup with monitor and gaming equipment",
     imagePosition: "center",
+    theme: "blue",
   },
   {
     id: 2,
@@ -36,15 +37,16 @@ const slides = [
     title: "Experience the",
     highlight: "Future Today.",
     description:
-      "Discover the latest smartphones with exceptional cameras, stunning displays, and powerful performance.",
-    product: "Latest Smartphones",
-    offer: "NEW COLLECTION",
-    price: "Explore the latest models",
+      "Explore the latest smartphones featuring stunning displays, advanced cameras, and powerful performance.",
+    offer: "LATEST COLLECTION",
+    price: "Discover the newest smartphones",
     buttonText: "Discover Phones",
     link: "/shop?category=smartphones",
     image:
-      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=2000&q=85",
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=85",
+    imageAlt: "Modern smartphone showcasing its display",
     imagePosition: "center",
+    theme: "indigo",
   },
   {
     id: 3,
@@ -53,15 +55,16 @@ const slides = [
     title: "Work Smarter.",
     highlight: "Go Further.",
     description:
-      "Find your perfect laptop for creativity, productivity, business, and everything in between.",
-    product: "Premium Laptops",
+      "Find the perfect laptop for your workflow, from everyday productivity to professional creativity.",
     offer: "SPECIAL PRICES",
-    price: "Explore laptop collection",
+    price: "Explore premium laptops",
     buttonText: "Explore Laptops",
     link: "/shop?category=laptops",
     image:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=2000&q=85",
+      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=85",
+    imageAlt: "Premium laptop on a clean modern workspace",
     imagePosition: "center",
+    theme: "sky",
   },
   {
     id: 4,
@@ -70,18 +73,18 @@ const slides = [
     title: "Feel Every",
     highlight: "Beat.",
     description:
-      "Discover premium headphones and audio accessories designed to bring every detail to life.",
-    product: "Premium Audio",
+      "Experience immersive sound with premium headphones designed for music lovers, creators, and everyday listening.",
     offer: "UP TO 25% OFF",
-    price: "Selected audio products",
+    price: "On selected audio products",
     buttonText: "Explore Audio",
     link: "/shop?category=accessories",
     image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=2000&q=85",
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
+    imageAlt: "Premium wireless headphones",
     imagePosition: "center",
+    theme: "violet",
   },
 ];
-
 
 const Hero = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -98,11 +101,7 @@ const Hero = () => {
     );
   };
 
-  const goToSlide = (index) => {
-    setActiveIndex(index);
-  };
-
-  // Preload the next image to reduce transition flicker.
+  // Preload the next slide image.
   useEffect(() => {
     const nextIndex = (activeIndex + 1) % slides.length;
     const image = new Image();
@@ -110,7 +109,7 @@ const Hero = () => {
     image.src = slides[nextIndex].image;
   }, [activeIndex]);
 
-  // Autoplay continues during hover and resets after manual navigation.
+  // Automatic carousel.
   useEffect(() => {
     const timeout = setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
@@ -122,171 +121,218 @@ const Hero = () => {
   return (
     <section
       aria-label="Featured products and promotions"
-      className="relative isolate mx-auto overflow-hidden bg-[#080d18]"
+      className="relative overflow-hidden bg-gradient-to-b from-white to-slate-50"
     >
-      {/* Background image */}
-      <div className="absolute inset-0 -z-20">
-        <img
-          key={activeSlide.id}
-          src={activeSlide.image}
-          alt=""
-          fetchPriority={activeIndex === 0 ? "high" : "auto"}
-          className="h-full w-full object-cover animate-[heroImage_700ms_ease-out]"
-          style={{ objectPosition: activeSlide.imagePosition }}
-        />
-      </div>
+      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
 
-      {/* Subtle overlays - image remains clearly visible */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#080d18]/95 via-[#080d18]/75 to-[#080d18]/10" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#080d18]/75 via-transparent to-[#080d18]/10" />
+        {/* Carousel Content */}
+        <div className="relative min-h-[540px] sm:min-h-[500px] lg:min-h-[460px]">
 
-      {/* Main content */}
-      <div className="relative mx-auto flex min-h-[440px] max-w-[1440px] items-center px-16 pb-24 pt-12 sm:min-h-[460px] sm:px-20 sm:pb-24 lg:min-h-[420px] lg:px-28 lg:py-12">
-        <div
-          key={activeSlide.id}
-          className="w-full max-w-[590px] animate-[heroContent_500ms_ease-out]"
-        >
-          {/* Badge */}
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-3.5 py-2 text-[10px] font-bold tracking-[0.14em] text-blue-300 backdrop-blur-sm sm:text-xs">
-              <Sparkles size={14} />
-              {activeSlide.badge}
-            </span>
+          <div
+            key={activeSlide.id}
+            className="grid min-h-[540px] items-center gap-10 animate-[heroFade_500ms_ease-out] sm:min-h-[500px] lg:min-h-[460px] lg:grid-cols-2 lg:gap-12"
+          >
+            {/* Left Content */}
+            <div className="relative z-10 flex flex-col items-start">
 
-            <span className="text-[10px] font-semibold tracking-[0.16em] text-gray-300 sm:text-xs">
-              {activeSlide.eyebrow}
-            </span>
-          </div>
+              {/* Eyebrow */}
+              <div className="mb-6 flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-bold tracking-wider text-blue-600">
+                  <Sparkles size={14} />
+                  {activeSlide.badge}
+                </span>
 
-          {/* Heading */}
-          <h1 className="mt-6 text-4xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-5xl lg:text-[58px]">
-            {activeSlide.title}
-            <span className="mt-1 block bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-              {activeSlide.highlight}
-            </span>
-          </h1>
+                <span className="text-[10px] font-semibold tracking-[0.16em] text-gray-400 sm:text-xs">
+                  {activeSlide.eyebrow}
+                </span>
+              </div>
 
-          {/* Description */}
-          <p className="mt-5 max-w-[490px] text-sm leading-7 text-gray-300 sm:text-base">
-            {activeSlide.description}
-          </p>
+              {/* Heading */}
+              <h1 className="max-w-xl text-4xl font-extrabold leading-[1.12] tracking-tight text-gray-900 sm:text-5xl lg:text-[58px]">
+                {activeSlide.title}
 
-          {/* Offer */}
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <span className="inline-flex items-center gap-2 rounded-lg border border-blue-400/25 bg-blue-500/15 px-4 py-2.5 text-xs font-bold tracking-wide text-white backdrop-blur-sm">
-              <Zap size={16} className="text-cyan-300" />
-              {activeSlide.offer}
-            </span>
+                <span className="mt-2 block text-blue-600">
+                  {activeSlide.highlight}
+                </span>
+              </h1>
 
-            <span className="text-sm font-medium text-gray-200">
-              {activeSlide.price}
-            </span>
-          </div>
+              {/* Description */}
+              <p className="mt-6 max-w-[480px] text-sm leading-7 text-gray-500 sm:text-base">
+                {activeSlide.description}
+              </p>
 
-          {/* Buttons */}
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link
-              to={activeSlide.link}
-              className="group inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500"
-            >
-              {activeSlide.buttonText}
-              <ArrowUpRight
-                size={17}
-                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </Link>
+              {/* Offer */}
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2.5 text-xs font-bold tracking-wide text-blue-700">
+                  <Zap size={15} />
+                  {activeSlide.offer}
+                </span>
 
-            <Link
-              to="/shop"
-              className="inline-flex items-center rounded-lg border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-white/60 hover:bg-white/10"
-            >
-              Browse Products
-            </Link>
-          </div>
+                <span className="text-sm font-medium text-gray-500">
+                  {activeSlide.price}
+                </span>
+              </div>
 
-          {/* Product label */}
-          <div className="mt-6 flex items-center gap-2 text-xs text-gray-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-            Featured: {activeSlide.product}
+              {/* CTA Buttons */}
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link
+                  to={activeSlide.link}
+                  className="group inline-flex items-center gap-2 rounded-full bg-blue-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/15 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl"
+                >
+                  {activeSlide.buttonText}
+
+                  <ArrowUpRight
+                    size={17}
+                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </Link>
+
+                <Link
+                  to="/shop"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-7 py-3.5 text-sm font-semibold text-gray-700 transition-all duration-300 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  <ShoppingBag size={16} />
+                  Browse Products
+                </Link>
+              </div>
+
+              {/* Trust / Product Info */}
+              <div className="mt-9 flex items-center gap-3 border-t border-gray-100 pt-5">
+                <div className="flex -space-x-2">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-blue-100 text-blue-600">
+                    <Zap size={14} />
+                  </span>
+
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-indigo-100 text-indigo-600">
+                    <Sparkles size={14} />
+                  </span>
+                </div>
+
+                <div>
+                  <p className="text-xs font-semibold text-gray-800">
+                    Explore Premium Technology
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-gray-400">
+                    Discover products made for your lifestyle
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Image */}
+            <div className="relative flex items-center justify-center">
+
+              {/* Decorative Background */}
+              <div className="absolute h-[85%] w-[85%] rounded-full bg-blue-100/60 blur-3xl" />
+
+              {/* Image Container */}
+              <div className="group relative w-full overflow-hidden rounded-[28px] border border-white bg-white p-2 shadow-[0_20px_70px_rgba(15,23,42,0.10)] sm:rounded-[32px]">
+                <div className="relative h-[260px] overflow-hidden rounded-[22px] bg-gray-100 sm:h-[340px] lg:h-[380px]">
+
+                  <img
+                    src={activeSlide.image}
+                    alt={activeSlide.imageAlt}
+                    fetchPriority={activeIndex === 0 ? "high" : "auto"}
+                    loading={activeIndex === 0 ? "eager" : "lazy"}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                    style={{
+                      objectPosition: activeSlide.imagePosition,
+                    }}
+                  />
+
+                  {/* Subtle image overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/25 via-transparent to-transparent" />
+
+                  {/* Image Label */}
+                  <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between gap-3">
+                    <span className="rounded-full border border-white/40 bg-white/90 px-4 py-2 text-xs font-semibold text-gray-800 shadow-sm backdrop-blur-md">
+                      {activeSlide.badge}
+                    </span>
+
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-blue-600 shadow-md">
+                      <ArrowUpRight size={19} />
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating offer card */}
+              <div className="absolute -bottom-4 left-2 z-10 rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-xl sm:-bottom-5 sm:left-0 sm:px-5 sm:py-4">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                  Featured Collection
+                </p>
+
+                <p className="mt-1 text-sm font-bold text-gray-900">
+                  {activeSlide.title} {activeSlide.highlight}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Left navigation */}
-      <button
-        type="button"
-        onClick={previousSlide}
-        aria-label="Previous promotion"
-        className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-md transition hover:border-blue-400 hover:bg-blue-600 sm:left-5 sm:h-12 sm:w-12"
-      >
-        <ArrowLeft size={19} />
-      </button>
+        {/* Carousel Controls */}
+        <div className="relative z-20 mt-12 flex items-center justify-between border-t border-gray-100 pt-6 sm:mt-10">
 
-      {/* Right navigation */}
-      <button
-        type="button"
-        onClick={nextSlide}
-        aria-label="Next promotion"
-        className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-md transition hover:border-blue-400 hover:bg-blue-600 sm:right-5 sm:h-12 sm:w-12"
-      >
-        <ArrowRight size={19} />
-      </button>
+          {/* Slide Counter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold tabular-nums text-gray-900">
+              {String(activeIndex + 1).padStart(2, "0")}
+            </span>
 
-      {/* Bottom centered pill pagination */}
-      <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
-        <div className="flex items-center gap-3 rounded-full border border-white/15 bg-[#080d18]/75 px-4 py-2.5 shadow-xl backdrop-blur-xl">
-          <span className="text-xs font-semibold tabular-nums text-white">
-            {String(activeIndex + 1).padStart(2, "0")}
-          </span>
+            <span className="text-sm text-gray-300">/</span>
 
-          {/* Progress indicators */}
-          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-medium tabular-nums text-gray-400">
+              {String(slides.length).padStart(2, "0")}
+            </span>
+          </div>
+
+          {/* Pill Indicators */}
+          <div className="flex items-center gap-2">
             {slides.map((slide, index) => (
               <button
                 key={slide.id}
                 type="button"
-                onClick={() => goToSlide(index)}
-                aria-label={`Go to promotion ${index + 1}`}
+                onClick={() => setActiveIndex(index)}
+                aria-label={`Go to slide ${index + 1}`}
                 aria-current={activeIndex === index ? "true" : undefined}
-                className={`relative h-1.5 overflow-hidden rounded-full transition-all duration-300 ${
+                className={`h-2 rounded-full transition-all duration-300 ${
                   activeIndex === index
-                    ? "w-8 bg-white/25"
-                    : "w-1.5 bg-white/35 hover:bg-white/70"
+                    ? "w-9 bg-blue-600"
+                    : "w-2 bg-gray-300 hover:bg-blue-300"
                 }`}
-              >
-                {activeIndex === index && (
-                  <span
-                    key={activeIndex}
-                    className="absolute inset-0 origin-left rounded-full bg-blue-400 animate-[heroProgress_4000ms_linear]"
-                  />
-                )}
-              </button>
+              />
             ))}
           </div>
 
-          <span className="text-xs font-medium tabular-nums text-gray-400">
-            {String(slides.length).padStart(2, "0")}
-          </span>
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={previousSlide}
+              aria-label="Previous slide"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition-all duration-200 hover:border-blue-600 hover:bg-blue-600 hover:text-white"
+            >
+              <ArrowLeft size={18} />
+            </button>
+
+            <button
+              type="button"
+              onClick={nextSlide}
+              aria-label="Next slide"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition-all duration-200 hover:border-blue-600 hover:bg-blue-600 hover:text-white"
+            >
+              <ArrowRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Animation styles */}
+      {/* Animation */}
       <style>{`
-        @keyframes heroImage {
-          from {
-            opacity: 0.75;
-            transform: scale(1.015);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes heroContent {
+        @keyframes heroFade {
           from {
             opacity: 0;
-            transform: translateY(12px);
+            transform: translateY(10px);
           }
           to {
             opacity: 1;
@@ -294,19 +340,8 @@ const Hero = () => {
           }
         }
 
-        @keyframes heroProgress {
-          from {
-            transform: scaleX(0);
-          }
-          to {
-            transform: scaleX(1);
-          }
-        }
-
         @media (prefers-reduced-motion: reduce) {
-          .animate-\\[heroImage_700ms_ease-out\\],
-          .animate-\\[heroContent_500ms_ease-out\\],
-          .animate-\\[heroProgress_4000ms_linear\\] {
+          .animate-\\[heroFade_500ms_ease-out\\] {
             animation: none !important;
           }
         }
