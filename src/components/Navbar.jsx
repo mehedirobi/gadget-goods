@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import {
   ShoppingCart,
@@ -24,225 +24,210 @@ import {
   Package,
   MoreHorizontal,
   ArrowRight,
-  Command,
 } from "lucide-react";
 
-import {products} from "../data/products";
+import { products } from "../data/products";
 
-const Navbar = () => {
-  const navigate = useNavigate();
+// ---------------------------------------------
+// CATEGORY DATA
+// ---------------------------------------------
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [showMore, setShowMore] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+const categories = [
+  {
+    name: "Phones",
+    icon: Smartphone,
+    path: "/category/phones",
+    featured: [
+      "iPhone",
+      "Samsung",
+      "Google",
+      "Xiaomi",
+      "OnePlus",
+      "Nothing",
+      "Realme",
+      "OPPO",
+      "Vivo",
+      "Motorola",
+    ],
+  },
+  {
+    name: "Tablets",
+    icon: Tablet,
+    path: "/category/tablets",
+    featured: [
+      "iPad",
+      "Samsung",
+      "Xiaomi",
+      "Lenovo",
+      "Android Tablets",
+      "Drawing Tablets",
+    ],
+  },
+  {
+    name: "Laptops",
+    icon: Laptop,
+    path: "/category/laptops",
+    featured: [
+      "Apple MacBook",
+      "ASUS",
+      "HP",
+      "Dell",
+      "Lenovo",
+      "Acer",
+      "MSI",
+      "Gaming Laptops",
+    ],
+  },
+  {
+    name: "Desktops",
+    icon: Monitor,
+    path: "/category/desktops",
+    featured: [
+      "Desktop PCs",
+      "All-in-One PCs",
+      "Mini PCs",
+      "Workstations",
+      "Branded PCs",
+      "Custom PCs",
+    ],
+  },
+  {
+    name: "Gadgets",
+    icon: Headphones,
+    path: "/category/gadgets",
+    featured: [
+      "Earbuds",
+      "Headphones",
+      "Speakers",
+      "Power Banks",
+      "Chargers",
+      "Smart Watches",
+      "Bluetooth Gadgets",
+      "Smart Home",
+    ],
+  },
+  {
+    name: "PC Components",
+    icon: Monitor,
+    path: "/category/pc-components",
+    featured: [
+      "Processors",
+      "Graphics Cards",
+      "Motherboards",
+      "RAM",
+      "SSD & HDD",
+      "Power Supplies",
+      "PC Cases",
+      "Cooling Systems",
+    ],
+  },
+  {
+    name: "Accessories",
+    icon: Package,
+    path: "/category/accessories",
+    featured: [
+      "Keyboards",
+      "Mouse",
+      "Mouse Pads",
+      "Monitors",
+      "USB Hubs",
+      "Cables & Adapters",
+      "Laptop Stands",
+      "Webcams",
+    ],
+  },
+  {
+    name: "Gaming",
+    icon: Gamepad2,
+    path: "/category/gaming",
+    featured: [
+      "Gaming Consoles",
+      "PlayStation",
+      "Xbox",
+      "Nintendo",
+      "Gaming Controllers",
+      "Gaming Headsets",
+      "Gaming Chairs",
+      "Gaming Accessories",
+    ],
+  },
+  {
+    name: "Smartwatches",
+    icon: Watch,
+    path: "/category/smartwatches",
+    featured: [
+      "Apple Watch",
+      "Samsung Watch",
+      "Xiaomi Watch",
+      "Amazfit",
+      "Fitness Bands",
+      "Smart Bands",
+    ],
+  },
+  {
+    name: "Cameras",
+    icon: Camera,
+    path: "/category/cameras",
+    featured: [
+      "DSLR Cameras",
+      "Mirrorless Cameras",
+      "Action Cameras",
+      "Digital Cameras",
+      "Camera Lenses",
+      "Camera Accessories",
+    ],
+  },
+  {
+    name: "Networking",
+    icon: Wifi,
+    path: "/category/networking",
+    featured: [
+      "WiFi Routers",
+      "Mesh Routers",
+      "Network Switches",
+      "Access Points",
+      "WiFi Adapters",
+      "Network Accessories",
+    ],
+  },
+  {
+    name: "Appliances",
+    icon: Home,
+    path: "/category/appliances",
+    featured: [
+      "Air Conditioners",
+      "Refrigerators",
+      "Air Purifiers",
+      "Kitchen Appliances",
+      "Home Appliances",
+      "Smart Home Devices",
+    ],
+  },
+];
 
-  // Product Categories
-  const categories = [
-    {
-      name: "Phones",
-      icon: Smartphone,
-      path: "/category/phones",
-      featured: [
-        "iPhone",
-        "Samsung",
-        "Google",
-        "Xiaomi",
-        "OnePlus",
-        "Nothing",
-        "Realme",
-        "OPPO",
-        "Vivo",
-        "Motorola",
-      ],
-    },
-    {
-      name: "Tablets",
-      icon: Tablet,
-      path: "/category/tablets",
-      featured: [
-        "iPad",
-        "Samsung",
-        "Xiaomi",
-        "Lenovo",
-        "Android Tablets",
-        "Drawing Tablets",
-      ],
-    },
-    {
-      name: "Laptops",
-      icon: Laptop,
-      path: "/category/laptops",
-      featured: [
-        "Apple MacBook",
-        "ASUS",
-        "HP",
-        "Dell",
-        "Lenovo",
-        "Acer",
-        "MSI",
-        "Gaming Laptops",
-      ],
-    },
-    {
-      name: "Desktops",
-      icon: Monitor,
-      path: "/category/desktops",
-      featured: [
-        "Desktop PCs",
-        "All-in-One PCs",
-        "Mini PCs",
-        "Workstations",
-        "Branded PCs",
-        "Custom PCs",
-      ],
-    },
-    {
-      name: "Gadgets",
-      icon: Headphones,
-      path: "/category/gadgets",
-      featured: [
-        "Earbuds",
-        "Headphones",
-        "Speakers",
-        "Power Banks",
-        "Chargers",
-        "Smart Watches",
-        "Bluetooth Gadgets",
-        "Smart Home",
-      ],
-    },
-    {
-      name: "PC Components",
-      icon: Monitor,
-      path: "/category/pc-components",
-      featured: [
-        "Processors",
-        "Graphics Cards",
-        "Motherboards",
-        "RAM",
-        "SSD & HDD",
-        "Power Supplies",
-        "PC Cases",
-        "Cooling Systems",
-      ],
-    },
-    {
-      name: "Accessories",
-      icon: Package,
-      path: "/category/accessories",
-      featured: [
-        "Keyboards",
-        "Mouse",
-        "Mouse Pads",
-        "Monitors",
-        "USB Hubs",
-        "Cables & Adapters",
-        "Laptop Stands",
-        "Webcams",
-      ],
-    },
-    {
-      name: "Gaming",
-      icon: Gamepad2,
-      path: "/category/gaming",
-      featured: [
-        "Gaming Consoles",
-        "PlayStation",
-        "Xbox",
-        "Nintendo",
-        "Gaming Controllers",
-        "Gaming Headsets",
-        "Gaming Chairs",
-        "Gaming Accessories",
-      ],
-    },
-    {
-      name: "Smartwatches",
-      icon: Watch,
-      path: "/category/smartwatches",
-      featured: [
-        "Apple Watch",
-        "Samsung Watch",
-        "Xiaomi Watch",
-        "Amazfit",
-        "Fitness Bands",
-        "Smart Bands",
-      ],
-    },
-    {
-      name: "Cameras",
-      icon: Camera,
-      path: "/category/cameras",
-      featured: [
-        "DSLR Cameras",
-        "Mirrorless Cameras",
-        "Action Cameras",
-        "Digital Cameras",
-        "Camera Lenses",
-        "Camera Accessories",
-      ],
-    },
-    {
-      name: "Networking",
-      icon: Wifi,
-      path: "/category/networking",
-      featured: [
-        "WiFi Routers",
-        "Mesh Routers",
-        "Network Switches",
-        "Access Points",
-        "WiFi Adapters",
-        "Network Accessories",
-      ],
-    },
-    {
-      name: "Appliances",
-      icon: Home,
-      path: "/category/appliances",
-      featured: [
-        "Air Conditioners",
-        "Refrigerators",
-        "Air Purifiers",
-        "Kitchen Appliances",
-        "Home Appliances",
-        "Smart Home Devices",
-      ],
-    },
-  ];
+const quickLinks = [
+  { name: "Blog", path: "/blog", icon: BookOpen },
+  { name: "Pre-orders", path: "/preorders", icon: Package },
+  { name: "Offers", path: "/offers", icon: Tag },
+];
 
-  const quickLinks = [
-    { name: "Blog", path: "/blog", icon: BookOpen },
-    { name: "Pre-orders", path: "/preorders", icon: Package },
-    { name: "Offers", path: "/offers", icon: Tag },
-  ];
+// ---------------------------------------------
+// SEARCH BOX
+// ---------------------------------------------
 
-  // Primary categories displayed directly in the navbar.
-  // All remaining categories are automatically placed inside More.
-  const primaryCategoryNames = [
-    "Phones",
-    "Tablets",
-    "Laptops",
-    "Desktops",
-    "Gadgets",
-    "PC Components",
-    "Gaming",
-  ];
+const SearchBox = ({
+  mobile = false,
+  query,
+  setQuery,
+  onSearch,
+}) => {
+  const searchRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const visibleCategories = categories.filter((category) =>
-    primaryCategoryNames.includes(category.name)
-  );
-
-  const moreCategories = categories.filter(
-    (category) => !primaryCategoryNames.includes(category.name)
-  );
-
-  // Live product search
   const searchResults = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const normalizedQuery = query.trim().toLowerCase();
 
-    if (!query) return [];
+    if (!normalizedQuery) return [];
 
     return products
       .filter((product) => {
@@ -256,74 +241,81 @@ const Navbar = () => {
           .join(" ")
           .toLowerCase();
 
-        return searchableText.includes(query);
+        return searchableText.includes(normalizedQuery);
       })
       .slice(0, 6);
-  }, [searchQuery]);
+  }, [query]);
 
-  const closeMenus = () => {
-    setIsMenuOpen(false);
-    setActiveCategory(null);
-    setShowMore(false);
-    setIsSearchFocused(false);
+  // Close suggestions when clicking outside.
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (!query.trim()) return;
+
+    setIsOpen(false);
+    onSearch(query.trim());
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-
-    const query = searchQuery.trim();
-
-    if (!query) return;
-
-    closeMenus();
-    navigate(`/shop?search=${encodeURIComponent(query)}`);
+  const handleProductSelect = (product) => {
+    setQuery(product.name);
+    setIsOpen(false);
+    onSearch(product.name);
   };
 
-  const handleProductSearch = () => {
-    const query = searchQuery.trim();
-
-    if (!query) return;
-
-    closeMenus();
-    navigate(`/shop?search=${encodeURIComponent(query)}`);
+  const handleClear = () => {
+    setQuery("");
+    setIsOpen(false);
   };
 
-  const toggleCategory = (name) => {
-    setActiveCategory((current) =>
-      current === name ? null : name
-    );
-
-    setShowMore(false);
-  };
-
-  // Reusable search component
-  const SearchBox = ({ mobile = false }) => (
-    <div className="relative w-full">
+  return (
+    <div ref={searchRef} className="relative w-full">
       <form
         role="search"
-        onSubmit={handleSearch}
-        className={`flex items-center rounded-full border bg-white transition-all duration-200 ${
-          isSearchFocused
-            ? "border-blue-500 shadow-md shadow-blue-100/60"
+        onSubmit={handleSubmit}
+        className={`flex w-full items-center rounded-full border bg-white transition-all duration-200 ${
+          isOpen
+            ? "border-blue-500 shadow-sm shadow-blue-100"
             : "border-gray-200 hover:border-gray-300"
-        } ${
-          mobile ? "h-11 px-4" : "h-[46px] px-5"
-        }`}
+        } ${mobile ? "h-11 px-3" : "h-11 px-4"}`}
       >
         <Search
-          size={mobile ? 18 : 19}
-          className="shrink-0 text-gray-500"
+          size={19}
+          className="shrink-0 text-gray-400"
         />
 
         <input
           type="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onFocus={() => setIsSearchFocused(true)}
-          onBlur={() => {
-            // Allow clicking suggestions before closing.
-            setTimeout(() => setIsSearchFocused(false), 180);
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setIsOpen(true);
           }}
+          onFocus={() => setIsOpen(true)}
           placeholder={
             mobile
               ? "Search products..."
@@ -331,16 +323,15 @@ const Navbar = () => {
           }
           aria-label="Search products"
           autoComplete="off"
-          className="h-full min-w-0 w-full bg-transparent px-3 text-sm font-medium text-gray-900 caret-blue-600 outline-none placeholder:font-normal placeholder:text-gray-400 [color-scheme:light]"
+          className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm font-medium text-gray-900 caret-blue-600 outline-none placeholder:font-normal placeholder:text-gray-400 [color-scheme:light]"
         />
 
-        {searchQuery && (
+        {query && (
           <button
             type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => setSearchQuery("")}
+            onClick={handleClear}
             aria-label="Clear search"
-            className="shrink-0 rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+            className="mr-1 rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
           >
             <X size={16} />
           </button>
@@ -349,35 +340,34 @@ const Navbar = () => {
         {!mobile && (
           <button
             type="submit"
-            className="shrink-0 rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
+            disabled={!query.trim()}
+            className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Search
           </button>
         )}
       </form>
 
-      {/* Live Search Suggestions */}
-      {isSearchFocused && searchQuery.trim() && (
+      {/* Search Suggestions */}
+      {isOpen && query.trim() && (
         <div className="absolute left-0 top-full z-[100] mt-2 w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-[0_12px_35px_rgba(0,0,0,0.13)]">
-
           <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
             <span className="text-xs font-bold text-gray-700">
-              Search Results
+              Search Suggestions
             </span>
 
             <span className="text-[11px] text-gray-400">
-              {searchResults.length} matching products
+              {searchResults.length} products
             </span>
           </div>
 
           {searchResults.length > 0 ? (
-            <div className="p-2">
+            <div className="max-h-[320px] overflow-y-auto p-2">
               {searchResults.map((product) => (
                 <button
-                  key={product.id}
+                  key={product.id ?? product._id ?? product.name}
                   type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={handleProductSearch}
+                  onClick={() => handleProductSelect(product)}
                   className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-3 text-left transition hover:bg-blue-50"
                 >
                   <div className="flex min-w-0 items-center gap-3">
@@ -421,8 +411,10 @@ const Navbar = () => {
 
           <button
             type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handleProductSearch}
+            onClick={() => {
+              setIsOpen(false);
+              onSearch(query.trim());
+            }}
             className="flex w-full items-center justify-center gap-2 border-t border-gray-100 py-3 text-xs font-bold text-blue-600 transition hover:bg-blue-50"
           >
             View all search results
@@ -432,76 +424,175 @@ const Navbar = () => {
       )}
     </div>
   );
+};
 
-  // Compact category dropdown
-  const CategoryDropdown = ({ category }) => {
-    const Icon = category.icon;
+// ---------------------------------------------
+// CATEGORY DROPDOWN
+// ---------------------------------------------
 
-    return (
-      <div className="absolute left-0 top-full z-50 w-[250px] pt-1.5">
-        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+const CategoryDropdown = ({ category, onClose }) => {
+  const Icon = category.icon;
 
-          <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">
-            <div className="flex items-center gap-2">
-              <Icon size={16} className="text-blue-600" />
+  return (
+    <div className="absolute left-0 top-full z-50 w-[235px] pt-1.5">
+      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Icon size={16} className="text-blue-600" />
 
-              <span className="text-sm font-bold text-gray-900">
-                {category.name}
-              </span>
-            </div>
+            <span className="text-sm font-bold text-gray-900">
+              {category.name}
+            </span>
+          </div>
 
+          <Link
+            to={category.path}
+            onClick={onClose}
+            className="text-[11px] font-semibold text-blue-600 hover:text-blue-700"
+          >
+            View All
+          </Link>
+        </div>
+
+        <div className="max-h-[280px] overflow-y-auto p-2">
+          {category.featured.map((item) => (
             <Link
+              key={item}
               to={category.path}
-              onClick={closeMenus}
-              className="text-[11px] font-semibold text-blue-600 hover:text-blue-700"
+              onClick={onClose}
+              className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[13px] font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
             >
-              View All
+              {item}
+              <ArrowRight
+                size={13}
+                className="text-gray-300"
+              />
             </Link>
-          </div>
-
-          <div className="max-h-[300px] overflow-y-auto p-2">
-            {category.featured.map((item) => (
-              <Link
-                key={item}
-                to={category.path}
-                onClick={closeMenus}
-                className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[13px] font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
-              >
-                {item}
-                <ArrowRight size={13} className="text-gray-300" />
-              </Link>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
+    </div>
+  );
+};
+
+// ---------------------------------------------
+// MAIN NAVBAR
+// ---------------------------------------------
+
+const Navbar = () => {
+  const navigate = useNavigate();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [showMore, setShowMore] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [navWidth, setNavWidth] = useState(0);
+
+  const navRef = useRef(null);
+
+  // Measure available navbar width.
+  useEffect(() => {
+    const navElement = navRef.current;
+
+    if (!navElement) return;
+
+    const updateWidth = () => {
+      setNavWidth(navElement.clientWidth);
+    };
+
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(navElement);
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Calculate how many categories can fit.
+  const visibleCount = useMemo(() => {
+    if (!navWidth) return 6;
+
+    const estimatedWidths = categories.map(
+      (category) => category.name.length * 6.3 + 43
     );
+
+    const totalWidth = estimatedWidths.reduce(
+      (total, width) => total + width,
+      0
+    );
+
+    if (totalWidth <= navWidth) {
+      return categories.length;
+    }
+
+    const availableWidth = navWidth - 68; // Reserve space for More.
+
+    let usedWidth = 0;
+    let count = 0;
+
+    for (const width of estimatedWidths) {
+      if (usedWidth + width > availableWidth) break;
+
+      usedWidth += width;
+      count++;
+    }
+
+    return Math.max(1, count);
+  }, [navWidth]);
+
+  const visibleCategories = categories.slice(0, visibleCount);
+  const moreCategories = categories.slice(visibleCount);
+
+  const closeMenus = () => {
+    setIsMenuOpen(false);
+    setActiveCategory(null);
+    setShowMore(false);
+  };
+
+  const handleSearch = (query) => {
+    if (!query.trim()) return;
+
+    closeMenus();
+    navigate(`/shop?search=${encodeURIComponent(query)}`);
+  };
+
+  const toggleCategory = (name) => {
+    setActiveCategory((current) =>
+      current === name ? null : name
+    );
+
+    setShowMore(false);
   };
 
   return (
     <header className="sticky top-0 z-50 bg-white">
-
-      {/* ================= TOP NAVBAR ================= */}
+      {/* =========================================
+          TOP NAVBAR
+      ========================================= */}
       <div className="border-b border-gray-100">
-        <div className="mx-auto flex h-[76px] max-w-[1440px] items-center gap-4 px-4 sm:px-6 lg:gap-6 lg:px-8">
-
+        <div className="mx-auto flex h-[68px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:gap-5 lg:px-7">
           {/* Logo */}
           <Link
             to="/"
             onClick={closeMenus}
             className="flex shrink-0 items-center gap-2"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
-              <Smartphone size={22} strokeWidth={2.2} />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
+              <Smartphone size={21} strokeWidth={2.2} />
             </div>
 
-            <h1 className="text-[21px] font-extrabold tracking-tight text-gray-900 sm:text-[23px]">
+            <span className="text-[20px] font-extrabold tracking-tight text-gray-900 sm:text-[22px]">
               Gadget<span className="text-blue-600">Goods</span>
-            </h1>
+            </span>
           </Link>
 
           {/* Desktop Search */}
-          <div className="mx-auto hidden w-full max-w-[600px] lg:block">
-            <SearchBox />
+          <div className="mx-auto hidden w-full max-w-[570px] lg:block">
+            <SearchBox
+              query={searchQuery}
+              setQuery={setSearchQuery}
+              onSearch={handleSearch}
+            />
           </div>
 
           {/* Quick Links */}
@@ -510,70 +601,77 @@ const Navbar = () => {
               <Link
                 key={path}
                 to={path}
-                className="whitespace-nowrap text-[12px] font-semibold text-gray-600 transition hover:text-blue-600"
+                className="whitespace-nowrap text-xs font-semibold text-gray-600 transition hover:text-blue-600"
               >
                 {name}
               </Link>
             ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="ml-auto flex shrink-0 items-center gap-1 lg:ml-0">
-
-            {/* Wishlist */}
+          {/* Actions */}
+          <div className="ml-auto flex shrink-0 items-center gap-0.5 lg:ml-0">
             <Link
               to="/wishlist"
               aria-label="Wishlist"
               title="Wishlist"
               className="rounded-full p-2.5 text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
             >
-              <Heart size={21} strokeWidth={1.8} />
+              <Heart size={20} strokeWidth={1.8} />
             </Link>
 
-            {/* Cart */}
             <Link
               to="/cart"
               aria-label="Shopping cart"
               title="Shopping cart"
               className="relative rounded-full p-2.5 text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
             >
-              <ShoppingCart size={21} strokeWidth={1.8} />
+              <ShoppingCart size={20} strokeWidth={1.8} />
 
               <span className="absolute right-0 top-0 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
                 0
               </span>
             </Link>
 
-            {/* Account Icon */}
             <Link
               to="/login"
               aria-label="Sign in"
               title="Sign in"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
             >
-              <UserRound size={20} strokeWidth={1.8} />
+              <UserRound size={19} strokeWidth={1.8} />
             </Link>
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu Toggle */}
             <button
               type="button"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => setIsMenuOpen((prev) => !prev)}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMenuOpen}
-              className="rounded-full p-2.5 text-gray-700 transition hover:bg-gray-100 lg:hidden"
+              className="rounded-full p-2 text-gray-700 transition hover:bg-gray-100 lg:hidden"
             >
-              {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              {isMenuOpen ? (
+                <X size={22} />
+              ) : (
+                <Menu size={22} />
+              )}
             </button>
           </div>
         </div>
 
-        {/* Mobile / Tablet Search */}
+        {/* Mobile Search */}
         <div className="px-4 pb-3 lg:hidden">
-          <SearchBox mobile />
+          <SearchBox
+            mobile
+            query={searchQuery}
+            setQuery={setSearchQuery}
+            onSearch={handleSearch}
+          />
         </div>
       </div>
 
-      {/* ================= CATEGORY NAVBAR ================= */}
+      {/* =========================================
+          DESKTOP CATEGORY NAVBAR
+      ========================================= */}
       <div
         className="relative hidden border-b border-gray-100 bg-white lg:block"
         onMouseLeave={() => {
@@ -581,11 +679,12 @@ const Navbar = () => {
           setShowMore(false);
         }}
       >
-        <div className="mx-auto flex h-[46px] max-w-[1440px] items-center px-4 sm:px-6 lg:px-8">
-
-          <nav className="flex h-full w-full items-center justify-between gap-1">
-
-            {/* Primary Categories */}
+        <nav
+          ref={navRef}
+          className="mx-auto flex h-[40px] max-w-[1440px] items-center justify-between gap-0 px-4 sm:px-6 lg:px-7"
+        >
+          {/* Visible Categories */}
+          <div className="flex h-full min-w-0 items-center gap-0">
             {visibleCategories.map((category) => {
               const Icon = category.icon;
               const isActive = activeCategory === category.name;
@@ -601,19 +700,22 @@ const Navbar = () => {
                 >
                   <Link
                     to={category.path}
-                    onFocus={() => setActiveCategory(category.name)}
-                    className={`flex h-full items-center gap-1 whitespace-nowrap border-b-2 px-2 text-[11px] font-semibold transition xl:px-2.5 xl:text-[12px] ${
+                    onFocus={() => {
+                      setActiveCategory(category.name);
+                      setShowMore(false);
+                    }}
+                    className={`flex h-full items-center gap-1 whitespace-nowrap border-b-2 px-2 text-[11px] font-semibold transition xl:px-2.5 xl:text-xs ${
                       isActive
                         ? "border-blue-600 text-blue-600"
                         : "border-transparent text-gray-600 hover:text-blue-600"
                     }`}
                   >
-                    <Icon size={15} strokeWidth={1.9} />
+                    <Icon size={14} strokeWidth={1.9} />
 
                     {category.name}
 
                     <ChevronDown
-                      size={12}
+                      size={11}
                       className={`transition-transform duration-200 ${
                         isActive ? "rotate-180" : ""
                       }`}
@@ -621,13 +723,18 @@ const Navbar = () => {
                   </Link>
 
                   {isActive && (
-                    <CategoryDropdown category={category} />
+                    <CategoryDropdown
+                      category={category}
+                      onClose={closeMenus}
+                    />
                   )}
                 </div>
               );
             })}
+          </div>
 
-            {/* More Categories */}
+          {/* More Categories */}
+          {moreCategories.length > 0 && (
             <div
               className="relative flex h-full shrink-0 items-center"
               onMouseEnter={() => {
@@ -638,18 +745,21 @@ const Navbar = () => {
               <button
                 type="button"
                 onClick={() => setShowMore((prev) => !prev)}
+                onFocus={() => {
+                  setActiveCategory(null);
+                  setShowMore(true);
+                }}
                 aria-expanded={showMore}
-                className={`flex h-full items-center gap-1 border-b-2 px-2 text-[12px] font-semibold transition ${
+                className={`flex h-full items-center gap-1 border-b-2 px-2 text-xs font-semibold transition ${
                   showMore
                     ? "border-blue-600 text-blue-600"
                     : "border-transparent text-gray-600 hover:text-blue-600"
                 }`}
               >
-                <MoreHorizontal size={17} />
+                <MoreHorizontal size={16} />
                 More
-
                 <ChevronDown
-                  size={12}
+                  size={11}
                   className={`transition-transform duration-200 ${
                     showMore ? "rotate-180" : ""
                   }`}
@@ -657,9 +767,8 @@ const Navbar = () => {
               </button>
 
               {showMore && (
-                <div className="absolute right-0 top-full z-50 w-[235px] pt-1.5">
+                <div className="absolute right-0 top-full z-50 w-[220px] pt-1.5">
                   <div className="overflow-hidden rounded-xl border border-gray-100 bg-white p-2 shadow-xl">
-
                     <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-gray-400">
                       More Categories
                     </p>
@@ -683,14 +792,15 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-          </nav>
-        </div>
+          )}
+        </nav>
       </div>
 
-      {/* ================= MOBILE NAVIGATION ================= */}
+      {/* =========================================
+          MOBILE NAVIGATION
+      ========================================= */}
       {isMenuOpen && (
-        <div className="max-h-[calc(100vh-130px)] overflow-y-auto border-t border-gray-100 bg-white shadow-xl lg:hidden">
-
+        <div className="max-h-[calc(100vh-125px)] overflow-y-auto border-t border-gray-100 bg-white shadow-xl lg:hidden">
           {/* Quick Links */}
           <div className="grid grid-cols-3 gap-2 border-b border-gray-100 p-4">
             {quickLinks.map(({ name, path, icon: Icon }) => (
