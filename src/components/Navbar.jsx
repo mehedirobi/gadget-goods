@@ -1,6 +1,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   Search,
@@ -32,11 +32,12 @@ import { products } from "../data/products";
 // CATEGORY DATA
 // ---------------------------------------------
 
+
 const categories = [
   {
     name: "Phones",
     icon: Smartphone,
-    path: "/category/phones",
+    path: "/shop?category=phones",
     featured: [
       "iPhone",
       "Samsung",
@@ -53,7 +54,7 @@ const categories = [
   {
     name: "Tablets",
     icon: Tablet,
-    path: "/category/tablets",
+    path: "/shop?category=tablets",
     featured: [
       "iPad",
       "Samsung",
@@ -66,7 +67,7 @@ const categories = [
   {
     name: "Laptops",
     icon: Laptop,
-    path: "/category/laptops",
+    path: "/shop?category=laptops",
     featured: [
       "Apple MacBook",
       "ASUS",
@@ -81,7 +82,7 @@ const categories = [
   {
     name: "Desktops",
     icon: Monitor,
-    path: "/category/desktops",
+    path: "/shop?category=desktops",
     featured: [
       "Desktop PCs",
       "All-in-One PCs",
@@ -94,7 +95,7 @@ const categories = [
   {
     name: "Gadgets",
     icon: Headphones,
-    path: "/category/gadgets",
+    path: "/shop?category=gadgets",
     featured: [
       "Earbuds",
       "Headphones",
@@ -109,7 +110,7 @@ const categories = [
   {
     name: "PC Components",
     icon: Monitor,
-    path: "/category/pc-components",
+    path: "/shop?category=pc-components",
     featured: [
       "Processors",
       "Graphics Cards",
@@ -124,7 +125,7 @@ const categories = [
   {
     name: "Accessories",
     icon: Package,
-    path: "/category/accessories",
+    path: "/shop?category=accessories",
     featured: [
       "Keyboards",
       "Mouse",
@@ -139,7 +140,7 @@ const categories = [
   {
     name: "Gaming",
     icon: Gamepad2,
-    path: "/category/gaming",
+    path: "/shop?category=gaming",
     featured: [
       "Gaming Consoles",
       "PlayStation",
@@ -154,7 +155,7 @@ const categories = [
   {
     name: "Smartwatches",
     icon: Watch,
-    path: "/category/smartwatches",
+    path: "/shop?category=smartwatches",
     featured: [
       "Apple Watch",
       "Samsung Watch",
@@ -167,7 +168,7 @@ const categories = [
   {
     name: "Cameras",
     icon: Camera,
-    path: "/category/cameras",
+    path: "/shop?category=cameras",
     featured: [
       "DSLR Cameras",
       "Mirrorless Cameras",
@@ -180,7 +181,7 @@ const categories = [
   {
     name: "Networking",
     icon: Wifi,
-    path: "/category/networking",
+    path: "/shop?category=networking",
     featured: [
       "WiFi Routers",
       "Mesh Routers",
@@ -193,7 +194,7 @@ const categories = [
   {
     name: "Appliances",
     icon: Home,
-    path: "/category/appliances",
+    path: "/shop?category=appliances",
     featured: [
       "Air Conditioners",
       "Refrigerators",
@@ -204,6 +205,7 @@ const categories = [
     ],
   },
 ];
+
 
 const quickLinks = [
   { name: "Blog", path: "/blog", icon: BookOpen },

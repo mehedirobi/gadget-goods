@@ -2,8 +2,8 @@
 import Hero from "../components/Hero";
 import FeaturedCategories from "../components/FeaturedCategories";
 import ExclusiveDeals from "../components/ExclusiveDeals";
-import BestSellers from "../components/BestSellers";
-import WhyChooseUs from "../components/WhyChooseUs";
+import BestSellers from "../components/BestSelling";
+import WhyChooseUs from "../components/WhyShopWithUs";
 import CustomerReviews from "../components/CustomerReviews";
 import Newsletter from "../components/Newsletter";
 

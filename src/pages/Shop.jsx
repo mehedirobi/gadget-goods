@@ -1,6 +1,6 @@
 
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { ArrowRight, PackageSearch } from "lucide-react";
 
 import { products } from "../data/products";

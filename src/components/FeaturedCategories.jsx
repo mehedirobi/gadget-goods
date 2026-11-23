@@ -1,158 +1,175 @@
-import { Link } from "react-router";
+
+import { Link } from "react-router-dom";
 import {
   Smartphone,
+  Tablet,
   Laptop,
   Monitor,
+  Cpu,
+  CircuitBoard,
   Gamepad2,
+  Cable,
   Watch,
-  Headphones,
-  ArrowUpRight,
+  Camera,
+  Wifi,
+  House,
   ArrowRight,
+  ChevronRight,
 } from "lucide-react";
 
-const categories = [
+export const categories = [
   {
     name: "Smartphones",
+    slug: "phones",
     icon: Smartphone,
-    count: "120+ Products",
-    slug: "smartphones",
-    color: "blue",
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-600",
-    hoverBg: "group-hover:bg-blue-600",
+    description: "Latest smartphones and mobile devices",
+  },
+  {
+    name: "Tablets",
+    slug: "tablets",
+    icon: Tablet,
+    description: "Tablets for work and entertainment",
   },
   {
     name: "Laptops",
-    icon: Laptop,
-    count: "85+ Products",
     slug: "laptops",
-    color: "violet",
-    iconBg: "bg-violet-50",
-    iconColor: "text-violet-600",
-    hoverBg: "group-hover:bg-violet-600",
+    icon: Laptop,
+    description: "Powerful laptops for every purpose",
   },
   {
     name: "Desktop PCs",
+    slug: "desktops",
     icon: Monitor,
-    count: "60+ Products",
-    slug: "desktop-pcs",
-    color: "emerald",
-    iconBg: "bg-emerald-50",
-    iconColor: "text-emerald-600",
-    hoverBg: "group-hover:bg-emerald-600",
+    description: "Desktop computers and workstations",
   },
   {
-    name: "Gaming Gear",
-    icon: Gamepad2,
-    count: "90+ Products",
+    name: "PC Components",
+    slug: "pc-components",
+    icon: Cpu,
+    description: "Essential parts for your PC build",
+  },
+  {
+    name: "Graphics Cards",
+    slug: "graphics-cards",
+    icon: CircuitBoard,
+    description: "High-performance GPUs",
+  },
+  {
+    name: "Gaming",
     slug: "gaming",
-    color: "orange",
-    iconBg: "bg-orange-50",
-    iconColor: "text-orange-600",
-    hoverBg: "group-hover:bg-orange-600",
-  },
-  {
-    name: "Smart Watches",
-    icon: Watch,
-    count: "45+ Products",
-    slug: "smartwatches",
-    color: "pink",
-    iconBg: "bg-pink-50",
-    iconColor: "text-pink-600",
-    hoverBg: "group-hover:bg-pink-600",
+    icon: Gamepad2,
+    description: "Gaming gear and peripherals",
   },
   {
     name: "Accessories",
-    icon: Headphones,
-    count: "150+ Products",
     slug: "accessories",
-    color: "cyan",
-    iconBg: "bg-cyan-50",
-    iconColor: "text-cyan-600",
-    hoverBg: "group-hover:bg-cyan-600",
+    icon: Cable,
+    description: "Everyday tech essentials",
+  },
+  {
+    name: "Smart Gadgets",
+    slug: "gadgets",
+    icon: Watch,
+    description: "Wearables and smart devices",
+  },
+  {
+    name: "Cameras",
+    slug: "cameras",
+    icon: Camera,
+    description: "Cameras and photography gear",
+  },
+  {
+    name: "Networking",
+    slug: "networking",
+    icon: Wifi,
+    description: "Routers and networking devices",
+  },
+  {
+    name: "Home Appliances",
+    slug: "home-appliances",
+    icon: House,
+    description: "Smart solutions for your home",
   },
 ];
 
+export const getCategoryPath = (slug) =>
+  `/shop?category=${encodeURIComponent(slug)}`;
+
 const FeaturedCategories = () => {
   return (
-    <section className="bg-white px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-      <div className="mx-auto max-w-7xl">
+    <section className="bg-white py-14 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Section Header */}
-        <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-
+        <div className="mb-8 flex items-end justify-between gap-4 sm:mb-10">
           <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-blue-600">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+            <span className="mb-2 inline-block text-xs font-bold uppercase tracking-[0.18em] text-primary sm:text-sm">
               Explore Our Collection
-            </div>
+            </span>
 
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Shop by <span className="text-blue-600">Category</span>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
+              Shop by Category
             </h2>
 
-            <p className="mt-3 text-sm leading-7 text-gray-500 sm:text-base">
-              Discover the latest technology and find the perfect gadgets
-              for your everyday lifestyle.
+            <p className="mt-2 text-sm leading-6 text-gray-500 sm:text-base">
+              Explore our collection of electronics, gadgets, and
+              accessories — everything you need in one place.
             </p>
           </div>
 
-          {/* View All */}
           <Link
-            to="/categories"
-            className="group inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all duration-300 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+            to="/shop"
+            className="hidden shrink-0 items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all duration-200 hover:border-primary hover:bg-primary hover:text-white sm:inline-flex"
           >
-            View All Categories
-
-            <ArrowUpRight
-              size={17}
-              className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
+            View All
+            <ArrowRight size={16} />
           </Link>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-6 lg:gap-5">
+        {/* Category Grid */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
           {categories.map((category) => {
             const Icon = category.icon;
 
             return (
               <Link
                 key={category.slug}
-                to={`/shop?category=${category.slug}`}
-                className="group relative flex min-h-[190px] flex-col items-center justify-center rounded-2xl border border-gray-100 bg-gray-50/70 p-5 text-center transition-all duration-300 hover:-translate-y-1.5 hover:border-gray-200 hover:bg-white hover:shadow-[0_12px_35px_rgba(15,23,42,0.07)] sm:min-h-[205px] sm:p-6"
+                to={getCategoryPath(category.slug)}
+                className="group relative flex min-h-[170px] flex-col rounded-xl border border-gray-200 bg-white p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-gray-200/70 sm:min-h-[185px] sm:rounded-2xl sm:p-5"
               >
                 {/* Icon */}
-                <div
-                  className={`flex h-[68px] w-[68px] items-center justify-center rounded-[22px] ${category.iconBg} ${category.iconColor} transition-all duration-300 ${category.hoverBg} group-hover:text-white group-hover:scale-110`}
-                >
-                  <Icon size={30} strokeWidth={1.8} />
+                <div className="mb-5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-700 transition-all duration-300 group-hover:bg-primary group-hover:text-white sm:h-12 sm:w-12">
+                  <Icon size={23} strokeWidth={1.8} />
                 </div>
 
-                {/* Category Name */}
-                <h3 className="mt-5 text-sm font-bold text-gray-800 transition-colors duration-200 group-hover:text-blue-600 sm:text-base">
-                  {category.name}
-                </h3>
+                {/* Category Info */}
+                <div className="flex flex-1 flex-col">
+                  <h3 className="text-sm font-bold leading-snug text-gray-900 transition-colors group-hover:text-primary sm:text-base">
+                    {category.name}
+                  </h3>
 
-                {/* Product Count */}
-                <p className="mt-2 text-xs font-medium text-gray-400">
-                  {category.count}
-                </p>
+                  <p className="mt-1.5 text-xs leading-relaxed text-gray-500">
+                    {category.description}
+                  </p>
+                </div>
 
-                {/* Hover Arrow */}
-                <span className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-white text-gray-400 opacity-0 shadow-sm transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100">
-                  <ArrowUpRight size={15} />
-                </span>
+                {/* Arrow */}
+                <div className="mt-3 flex items-center justify-end">
+                  <ChevronRight
+                    size={17}
+                    className="text-gray-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary"
+                  />
+                </div>
               </Link>
             );
           })}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-8 flex justify-center sm:hidden">
+        {/* Mobile View All */}
+        <div className="mt-7 flex justify-center sm:hidden">
           <Link
-            to="/categories"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600"
+            to="/shop"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition-colors hover:border-primary hover:text-primary"
           >
             Explore All Categories
             <ArrowRight size={16} />
