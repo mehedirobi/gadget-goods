@@ -7,6 +7,8 @@ import Shop from "../pages/Shop";
 import About from "../pages/About";
 import Categories from "../pages/Categories";
 import Contact from "../pages/Contact";
+import Blog from "../pages/Blog";
+import BlogDetails from "../pages/BlogDetails";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,14 @@ const router = createBrowserRouter([
         path: "contact",
         element: <Contact />,
       },
+      {
+  path: "/blog",
+  element: <Blog />,
+},
+{
+  path: "/blog/:slug",
+  element: <BlogDetails />,
+},
     ],
   },
 ]);
