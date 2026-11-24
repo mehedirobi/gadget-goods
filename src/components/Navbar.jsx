@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -23,10 +24,15 @@ import {
   Package,
   MoreHorizontal,
   ArrowRight,
-  Sparkles,
+  LogOut,
+  Settings,
+  User,
+  LayoutDashboard,
+  LoaderCircle,
 } from "lucide-react";
 
 import { products } from "../data/products";
+import { useAuth } from "../contexts/AuthContext";
 
 const CART_KEY = "gadgetgoods-cart";
 
@@ -153,7 +159,7 @@ const quickLinks = [
 ];
 
 // =============================================
-// CART COUNT HELPERS
+// HELPERS
 // =============================================
 
 const getCartCount = () => {
@@ -163,7 +169,8 @@ const getCartCount = () => {
     if (!Array.isArray(cart)) return 0;
 
     return cart.reduce(
-      (total, item) => total + Math.max(0, Number(item.quantity) || 0),
+      (total, item) =>
+        total + Math.max(0, Number(item.quantity) || 0),
       0
     );
   } catch {
@@ -171,8 +178,48 @@ const getCartCount = () => {
   }
 };
 
+const getUserName = (user) => {
+  return (
+    user?.displayName ||
+    user?.email?.split("@")[0] ||
+    "My Account"
+  );
+};
+
+const getUserInitials = (user) => {
+  const name = getUserName(user);
+
+  return name
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "U";
+};
+
 // =============================================
-// CART ACTION BUTTON
+// BRAND LOGO
+// =============================================
+
+const BrandLogo = ({ onClick }) => (
+  <Link
+    to="/"
+    onClick={onClick}
+    aria-label="GadgetGoods Home"
+    className="flex shrink-0 items-center gap-2"
+  >
+    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200">
+      <Smartphone size={21} strokeWidth={2.2} />
+    </div>
+
+    <span className="text-[20px] font-extrabold tracking-tight text-gray-900 sm:text-[22px]">
+      Gadget<span className="text-blue-600">Goods</span>
+    </span>
+  </Link>
+);
+
+// =============================================
+// CART BUTTON
 // =============================================
 
 const CartButton = ({ count, onClick, mobile = false }) => (
@@ -194,6 +241,169 @@ const CartButton = ({ count, onClick, mobile = false }) => (
     )}
   </Link>
 );
+
+// =============================================
+// USER AVATAR
+// =============================================
+
+const UserAvatar = ({ user, size = "normal" }) => {
+  const [imageError, setImageError] = useState(false);
+
+  const photoURL = user?.photoURL;
+
+  const sizeClass =
+    size === "large"
+      ? "h-11 w-11 text-sm"
+      : "h-9 w-9 text-xs";
+
+  if (photoURL && !imageError) {
+    return (
+      <img
+        src={photoURL}
+        alt={`${getUserName(user)} profile`}
+        referrerPolicy="no-referrer"
+        onError={() => setImageError(true)}
+        className={`${sizeClass} shrink-0 rounded-full border border-gray-200 object-cover`}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`${sizeClass} flex shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700`}
+      aria-label={`${getUserName(user)} avatar`}
+    >
+      {getUserInitials(user)}
+    </div>
+  );
+};
+
+// =============================================
+// USER ACCOUNT DROPDOWN
+// =============================================
+
+const UserAccount = ({ user, onLogout, loggingOut }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const accountRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        accountRef.current &&
+        !accountRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  return (
+    <div ref={accountRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen((previous) => !previous)}
+        aria-label="Open account menu"
+        aria-expanded={isOpen}
+        className="flex items-center gap-2 rounded-full p-1 transition hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
+        <UserAvatar user={user} />
+
+        <div className="hidden max-w-[105px] text-left xl:block">
+          <p className="truncate text-xs font-bold text-gray-800">
+            {getUserName(user)}
+          </p>
+          <p className="text-[10px] text-gray-400">My Account</p>
+        </div>
+
+        <ChevronDown
+          size={14}
+          className={`hidden text-gray-400 transition-transform xl:block ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full z-[110] mt-3 w-[270px] overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_15px_45px_rgba(0,0,0,0.14)]">
+          <div className="border-b border-gray-100 bg-gray-50 p-4">
+            <div className="flex items-center gap-3">
+              <UserAvatar user={user} size="large" />
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-gray-900">
+                  {getUserName(user)}
+                </p>
+                <p className="truncate text-xs text-gray-500">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1 p-2">
+            <Link
+              to="/profile"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
+            >
+              <User size={17} />
+              My Profile
+            </Link>
+
+            <Link
+              to="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
+            >
+              <LayoutDashboard size={17} />
+              Dashboard
+            </Link>
+
+            <Link
+              to="/settings"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
+            >
+              <Settings size={17} />
+              Settings
+            </Link>
+          </div>
+
+          <div className="border-t border-gray-100 p-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                onLogout();
+              }}
+              disabled={loggingOut}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loggingOut ? (
+                <LoaderCircle size={17} className="animate-spin" />
+              ) : (
+                <LogOut size={17} />
+              )}
+              {loggingOut ? "Signing out..." : "Logout"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // =============================================
 // SEARCH BOX
@@ -230,7 +440,6 @@ const SearchBox = ({
       .slice(0, 6);
   }, [query]);
 
-  // Close search dropdown on outside click and Escape.
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (
@@ -242,9 +451,7 @@ const SearchBox = ({
     };
 
     const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
+      if (event.key === "Escape") setIsOpen(false);
     };
 
     document.addEventListener("pointerdown", handleOutsideClick);
@@ -299,7 +506,7 @@ const SearchBox = ({
           }
           aria-label="Search products"
           autoComplete="off"
-          className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm font-medium text-gray-900 outline-none placeholder:font-normal placeholder:text-gray-400 [color-scheme:light]"
+          className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm font-medium text-gray-900 outline-none placeholder:font-normal placeholder:text-gray-400"
         />
 
         {query && (
@@ -327,7 +534,6 @@ const SearchBox = ({
         )}
       </form>
 
-      {/* Search Suggestions */}
       {isOpen && query.trim() && (
         <div className="absolute left-0 top-full z-[100] mt-2 w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-[0_12px_35px_rgba(0,0,0,0.13)]">
           <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
@@ -444,7 +650,6 @@ const CategoryDropdown = ({ category, onClose }) => {
               className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[13px] font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
             >
               {item}
-
               <ArrowRight size={13} className="text-gray-300" />
             </Link>
           ))}
@@ -461,12 +666,16 @@ const CategoryDropdown = ({ category, onClose }) => {
 const Navbar = () => {
   const navigate = useNavigate();
 
+  // Firebase authentication state
+  const { user, logout } = useAuth();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [showMore, setShowMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [navWidth, setNavWidth] = useState(0);
   const [cartCount, setCartCount] = useState(getCartCount);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const navRef = useRef(null);
 
@@ -476,7 +685,10 @@ const Navbar = () => {
 
   useEffect(() => {
     const syncCartCount = (event) => {
-      if (event.type === "cart-updated" && event.detail) {
+      if (
+        event.type === "cart-updated" &&
+        Array.isArray(event.detail)
+      ) {
         const count = event.detail.reduce(
           (total, item) =>
             total + Math.max(0, Number(item.quantity) || 0),
@@ -536,15 +748,6 @@ const Navbar = () => {
       (category) => category.name.length * 6.3 + 48
     );
 
-    const totalWidth = estimatedWidths.reduce(
-      (total, width) => total + width,
-      0
-    );
-
-    if (totalWidth <= navWidth) {
-      return categories.length;
-    }
-
     const availableWidth = navWidth - 75;
 
     let usedWidth = 0;
@@ -557,7 +760,7 @@ const Navbar = () => {
       count++;
     }
 
-    return Math.max(1, count);
+    return Math.max(1, Math.min(count, categories.length));
   }, [navWidth]);
 
   const visibleCategories = categories.slice(0, visibleCount);
@@ -593,9 +796,50 @@ const Navbar = () => {
     setShowMore(false);
   };
 
-  // =============================================
+  // ---------------------------------------------
+  // LOGOUT
+  // ---------------------------------------------
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+
+    try {
+      setLoggingOut(true);
+      closeMenus();
+
+      await logout();
+
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setLoggingOut(false);
+    }
+  };
+
+  // ---------------------------------------------
+  // CLOSE MOBILE MENU ON ESCAPE
+  // ---------------------------------------------
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        setActiveCategory(null);
+        setShowMore(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  // ---------------------------------------------
   // RENDER
-  // =============================================
+  // ---------------------------------------------
 
   return (
     <header className="sticky top-0 z-50 bg-white">
@@ -605,22 +849,8 @@ const Navbar = () => {
 
       <div className="border-b border-gray-100">
         <div className="mx-auto flex h-[68px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:gap-5 lg:px-7">
-
           {/* Logo */}
-          <Link
-            to="/"
-            onClick={closeMenus}
-            aria-label="GadgetGoods Home"
-            className="flex shrink-0 items-center gap-2"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200">
-              <Smartphone size={21} strokeWidth={2.2} />
-            </div>
-
-            <span className="text-[20px] font-extrabold tracking-tight text-gray-900 sm:text-[22px]">
-              Gadget<span className="text-blue-600">Goods</span>
-            </span>
-          </Link>
+          <BrandLogo onClick={closeMenus} />
 
           {/* Desktop Search */}
           <div className="mx-auto hidden w-full max-w-[570px] lg:block">
@@ -646,7 +876,6 @@ const Navbar = () => {
 
           {/* Action Buttons */}
           <div className="ml-auto flex shrink-0 items-center gap-0.5 lg:ml-0">
-
             {/* Wishlist */}
             <Link
               to="/wishlist"
@@ -657,23 +886,31 @@ const Navbar = () => {
               <Heart size={20} strokeWidth={1.8} />
             </Link>
 
-            {/* Cart with Dynamic Badge */}
+            {/* Cart */}
             <CartButton count={cartCount} />
 
             {/* Account */}
-            <Link
-              to="/login"
-              aria-label="Sign in"
-              title="Sign in"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-            >
-              <UserRound size={19} strokeWidth={1.8} />
-            </Link>
+            {user ? (
+              <UserAccount
+                user={user}
+                onLogout={handleLogout}
+                loggingOut={loggingOut}
+              />
+            ) : (
+              <Link
+                to="/login"
+                aria-label="Sign in"
+                title="Sign in"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <UserRound size={19} strokeWidth={1.8} />
+              </Link>
+            )}
 
             {/* Mobile Menu Toggle */}
             <button
               type="button"
-              onClick={() => setIsMenuOpen((prev) => !prev)}
+              onClick={() => setIsMenuOpen((previous) => !previous)}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMenuOpen}
               className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition hover:bg-gray-100 lg:hidden"
@@ -710,7 +947,6 @@ const Navbar = () => {
           aria-label="Product categories"
           className="mx-auto flex h-[42px] max-w-[1440px] items-center justify-between gap-0 px-4 sm:px-6 lg:px-7"
         >
-          {/* Visible Categories */}
           <div className="flex h-full min-w-0 items-center gap-0">
             {visibleCategories.map((category) => {
               const Icon = category.icon;
@@ -720,11 +956,15 @@ const Navbar = () => {
                 <div
                   key={category.name}
                   className="relative flex h-full shrink-0 items-center"
-                  onMouseEnter={() => handleCategoryHover(category.name)}
+                  onMouseEnter={() =>
+                    handleCategoryHover(category.name)
+                  }
                 >
                   <Link
                     to={category.path}
-                    onFocus={() => handleCategoryHover(category.name)}
+                    onFocus={() =>
+                      handleCategoryHover(category.name)
+                    }
                     aria-expanded={isActive}
                     className={`flex h-full items-center gap-1 whitespace-nowrap border-b-2 px-2 text-[11px] font-semibold transition xl:px-2.5 xl:text-xs ${
                       isActive
@@ -766,7 +1006,7 @@ const Navbar = () => {
             >
               <button
                 type="button"
-                onClick={() => setShowMore((prev) => !prev)}
+                onClick={() => setShowMore((previous) => !previous)}
                 onFocus={() => {
                   setActiveCategory(null);
                   setShowMore(true);
@@ -825,7 +1065,6 @@ const Navbar = () => {
 
       {isMenuOpen && (
         <div className="max-h-[calc(100dvh-125px)] overflow-y-auto border-t border-gray-100 bg-white shadow-xl lg:hidden">
-
           {/* Quick Links */}
           <div className="grid grid-cols-3 gap-2 border-b border-gray-100 p-4">
             {quickLinks.map(({ name, path, icon: Icon }) => (
@@ -897,17 +1136,53 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Account, Wishlist & Cart */}
+          {/* Mobile Account */}
           <div className="border-t border-gray-100 p-4">
+            {user ? (
+              <>
+                <div className="mb-3 flex items-center gap-3 rounded-xl bg-gray-50 p-3">
+                  <UserAvatar user={user} size="large" />
 
-            <Link
-              to="/login"
-              onClick={closeMenus}
-              className="mb-2 flex items-center gap-3 rounded-xl bg-gray-900 px-3 py-3 text-sm font-semibold text-white transition hover:bg-black"
-            >
-              <UserRound size={19} />
-              Sign In / Login
-            </Link>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-gray-900">
+                      {getUserName(user)}
+                    </p>
+                    <p className="truncate text-xs text-gray-500">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+                  >
+                    {loggingOut ? (
+                      <LoaderCircle
+                        size={18}
+                        className="animate-spin"
+                      />
+                    ) : (
+                      <LogOut size={18} />
+                    )}
+                    {loggingOut ? "Signing out..." : "Logout"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={closeMenus}
+                className="mb-2 flex items-center gap-3 rounded-xl bg-gray-900 px-3 py-3 text-sm font-semibold text-white transition hover:bg-black"
+              >
+                <UserRound size={19} />
+                Sign In / Login
+              </Link>
+            )}
 
             <Link
               to="/wishlist"
