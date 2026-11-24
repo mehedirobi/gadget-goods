@@ -9,6 +9,7 @@ import Contact from "../pages/Contact";
 import Blog from "../pages/Blog";
 import BlogDetails from "../pages/BlogDetails";
 import PreOrder from "../pages/PreOrder";
+import Offers from "../pages/Offers";
 
 const router = createBrowserRouter([
   {
@@ -36,17 +37,21 @@ const router = createBrowserRouter([
         element: <Contact />,
       },
       {
-  path: "preorders",
-  element: <PreOrder />,
-},
+        path: "preorders",
+        element: <PreOrder />,
+      },
       {
-  path: "/blog",
-  element: <Blog />,
-},
-{
-  path: "/blog/:slug",
-  element: <BlogDetails />,
-},
+        path: "/offers",
+        element: <Offers />,
+      },
+      {
+        path: "/blog",
+        element: <Blog />,
+      },
+      {
+        path: "/blog/:slug",
+        element: <BlogDetails />,
+      },
     ],
   },
 ]);
