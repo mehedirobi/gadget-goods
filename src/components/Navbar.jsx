@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -24,14 +23,16 @@ import {
   Package,
   MoreHorizontal,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 
 import { products } from "../data/products";
 
-// ---------------------------------------------
-// CATEGORY DATA
-// ---------------------------------------------
+const CART_KEY = "gadgetgoods-cart";
 
+// =============================================
+// CATEGORY DATA
+// =============================================
 
 const categories = [
   {
@@ -39,16 +40,8 @@ const categories = [
     icon: Smartphone,
     path: "/shop?category=phones",
     featured: [
-      "iPhone",
-      "Samsung",
-      "Google",
-      "Xiaomi",
-      "OnePlus",
-      "Nothing",
-      "Realme",
-      "OPPO",
-      "Vivo",
-      "Motorola",
+      "iPhone", "Samsung", "Google", "Xiaomi", "OnePlus",
+      "Nothing", "Realme", "OPPO", "Vivo", "Motorola",
     ],
   },
   {
@@ -56,12 +49,8 @@ const categories = [
     icon: Tablet,
     path: "/shop?category=tablets",
     featured: [
-      "iPad",
-      "Samsung",
-      "Xiaomi",
-      "Lenovo",
-      "Android Tablets",
-      "Drawing Tablets",
+      "iPad", "Samsung", "Xiaomi", "Lenovo",
+      "Android Tablets", "Drawing Tablets",
     ],
   },
   {
@@ -69,14 +58,8 @@ const categories = [
     icon: Laptop,
     path: "/shop?category=laptops",
     featured: [
-      "Apple MacBook",
-      "ASUS",
-      "HP",
-      "Dell",
-      "Lenovo",
-      "Acer",
-      "MSI",
-      "Gaming Laptops",
+      "Apple MacBook", "ASUS", "HP", "Dell",
+      "Lenovo", "Acer", "MSI", "Gaming Laptops",
     ],
   },
   {
@@ -84,12 +67,8 @@ const categories = [
     icon: Monitor,
     path: "/shop?category=desktops",
     featured: [
-      "Desktop PCs",
-      "All-in-One PCs",
-      "Mini PCs",
-      "Workstations",
-      "Branded PCs",
-      "Custom PCs",
+      "Desktop PCs", "All-in-One PCs", "Mini PCs",
+      "Workstations", "Branded PCs", "Custom PCs",
     ],
   },
   {
@@ -97,14 +76,8 @@ const categories = [
     icon: Headphones,
     path: "/shop?category=gadgets",
     featured: [
-      "Earbuds",
-      "Headphones",
-      "Speakers",
-      "Power Banks",
-      "Chargers",
-      "Smart Watches",
-      "Bluetooth Gadgets",
-      "Smart Home",
+      "Earbuds", "Headphones", "Speakers", "Power Banks",
+      "Chargers", "Smart Watches", "Bluetooth Gadgets", "Smart Home",
     ],
   },
   {
@@ -112,14 +85,8 @@ const categories = [
     icon: Monitor,
     path: "/shop?category=pc-components",
     featured: [
-      "Processors",
-      "Graphics Cards",
-      "Motherboards",
-      "RAM",
-      "SSD & HDD",
-      "Power Supplies",
-      "PC Cases",
-      "Cooling Systems",
+      "Processors", "Graphics Cards", "Motherboards", "RAM",
+      "SSD & HDD", "Power Supplies", "PC Cases", "Cooling Systems",
     ],
   },
   {
@@ -127,14 +94,8 @@ const categories = [
     icon: Package,
     path: "/shop?category=accessories",
     featured: [
-      "Keyboards",
-      "Mouse",
-      "Mouse Pads",
-      "Monitors",
-      "USB Hubs",
-      "Cables & Adapters",
-      "Laptop Stands",
-      "Webcams",
+      "Keyboards", "Mouse", "Mouse Pads", "Monitors",
+      "USB Hubs", "Cables & Adapters", "Laptop Stands", "Webcams",
     ],
   },
   {
@@ -142,14 +103,9 @@ const categories = [
     icon: Gamepad2,
     path: "/shop?category=gaming",
     featured: [
-      "Gaming Consoles",
-      "PlayStation",
-      "Xbox",
-      "Nintendo",
-      "Gaming Controllers",
-      "Gaming Headsets",
-      "Gaming Chairs",
-      "Gaming Accessories",
+      "Gaming Consoles", "PlayStation", "Xbox", "Nintendo",
+      "Gaming Controllers", "Gaming Headsets",
+      "Gaming Chairs", "Gaming Accessories",
     ],
   },
   {
@@ -157,12 +113,8 @@ const categories = [
     icon: Watch,
     path: "/shop?category=smartwatches",
     featured: [
-      "Apple Watch",
-      "Samsung Watch",
-      "Xiaomi Watch",
-      "Amazfit",
-      "Fitness Bands",
-      "Smart Bands",
+      "Apple Watch", "Samsung Watch", "Xiaomi Watch",
+      "Amazfit", "Fitness Bands", "Smart Bands",
     ],
   },
   {
@@ -170,12 +122,8 @@ const categories = [
     icon: Camera,
     path: "/shop?category=cameras",
     featured: [
-      "DSLR Cameras",
-      "Mirrorless Cameras",
-      "Action Cameras",
-      "Digital Cameras",
-      "Camera Lenses",
-      "Camera Accessories",
+      "DSLR Cameras", "Mirrorless Cameras", "Action Cameras",
+      "Digital Cameras", "Camera Lenses", "Camera Accessories",
     ],
   },
   {
@@ -183,12 +131,8 @@ const categories = [
     icon: Wifi,
     path: "/shop?category=networking",
     featured: [
-      "WiFi Routers",
-      "Mesh Routers",
-      "Network Switches",
-      "Access Points",
-      "WiFi Adapters",
-      "Network Accessories",
+      "WiFi Routers", "Mesh Routers", "Network Switches",
+      "Access Points", "WiFi Adapters", "Network Accessories",
     ],
   },
   {
@@ -196,16 +140,11 @@ const categories = [
     icon: Home,
     path: "/shop?category=appliances",
     featured: [
-      "Air Conditioners",
-      "Refrigerators",
-      "Air Purifiers",
-      "Kitchen Appliances",
-      "Home Appliances",
-      "Smart Home Devices",
+      "Air Conditioners", "Refrigerators", "Air Purifiers",
+      "Kitchen Appliances", "Home Appliances", "Smart Home Devices",
     ],
   },
 ];
-
 
 const quickLinks = [
   { name: "Blog", path: "/blog", icon: BookOpen },
@@ -213,9 +152,52 @@ const quickLinks = [
   { name: "Offers", path: "/offers", icon: Tag },
 ];
 
-// ---------------------------------------------
+// =============================================
+// CART COUNT HELPERS
+// =============================================
+
+const getCartCount = () => {
+  try {
+    const cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+
+    if (!Array.isArray(cart)) return 0;
+
+    return cart.reduce(
+      (total, item) => total + Math.max(0, Number(item.quantity) || 0),
+      0
+    );
+  } catch {
+    return 0;
+  }
+};
+
+// =============================================
+// CART ACTION BUTTON
+// =============================================
+
+const CartButton = ({ count, onClick, mobile = false }) => (
+  <Link
+    to="/cart"
+    onClick={onClick}
+    aria-label={`Shopping cart, ${count} items`}
+    title="Shopping Cart"
+    className={`relative flex shrink-0 items-center justify-center rounded-full text-gray-600 transition hover:bg-blue-50 hover:text-blue-600 ${
+      mobile ? "h-11 w-11" : "h-10 w-10"
+    }`}
+  >
+    <ShoppingCart size={21} strokeWidth={1.8} />
+
+    {count > 0 && (
+      <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-blue-600 px-1 text-[9px] font-bold leading-none text-white">
+        {count > 99 ? "99+" : count}
+      </span>
+    )}
+  </Link>
+);
+
+// =============================================
 // SEARCH BOX
-// ---------------------------------------------
+// =============================================
 
 const SearchBox = ({
   mobile = false,
@@ -248,7 +230,7 @@ const SearchBox = ({
       .slice(0, 6);
   }, [query]);
 
-  // Close suggestions when clicking outside.
+  // Close search dropdown on outside click and Escape.
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (
@@ -289,26 +271,18 @@ const SearchBox = ({
     onSearch(product.name);
   };
 
-  const handleClear = () => {
-    setQuery("");
-    setIsOpen(false);
-  };
-
   return (
     <div ref={searchRef} className="relative w-full">
       <form
         role="search"
         onSubmit={handleSubmit}
-        className={`flex w-full items-center rounded-full border bg-white transition-all duration-200 ${
+        className={`flex h-11 w-full items-center rounded-full border bg-white px-4 transition-all ${
           isOpen
             ? "border-blue-500 shadow-sm shadow-blue-100"
             : "border-gray-200 hover:border-gray-300"
-        } ${mobile ? "h-11 px-3" : "h-11 px-4"}`}
+        }`}
       >
-        <Search
-          size={19}
-          className="shrink-0 text-gray-400"
-        />
+        <Search size={19} className="shrink-0 text-gray-400" />
 
         <input
           type="search"
@@ -325,15 +299,18 @@ const SearchBox = ({
           }
           aria-label="Search products"
           autoComplete="off"
-          className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm font-medium text-gray-900 caret-blue-600 outline-none placeholder:font-normal placeholder:text-gray-400 [color-scheme:light]"
+          className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm font-medium text-gray-900 outline-none placeholder:font-normal placeholder:text-gray-400 [color-scheme:light]"
         />
 
         {query && (
           <button
             type="button"
-            onClick={handleClear}
+            onClick={() => {
+              setQuery("");
+              setIsOpen(false);
+            }}
             aria-label="Clear search"
-            className="mr-1 rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+            className="mr-2 rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
           >
             <X size={16} />
           </button>
@@ -388,9 +365,11 @@ const SearchBox = ({
                     </div>
                   </div>
 
-                  <span className="shrink-0 text-xs font-bold text-gray-800">
-                    ৳{Number(product.price).toLocaleString("en-BD")}
-                  </span>
+                  {Number.isFinite(Number(product.price)) && (
+                    <span className="shrink-0 text-xs font-bold text-gray-800">
+                      ৳{Number(product.price).toLocaleString("en-BD")}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -428,19 +407,19 @@ const SearchBox = ({
   );
 };
 
-// ---------------------------------------------
+// =============================================
 // CATEGORY DROPDOWN
-// ---------------------------------------------
+// =============================================
 
 const CategoryDropdown = ({ category, onClose }) => {
   const Icon = category.icon;
 
   return (
-    <div className="absolute left-0 top-full z-50 w-[235px] pt-1.5">
-      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+    <div className="absolute left-0 top-full z-50 w-[245px] pt-1.5">
+      <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-[0_15px_40px_rgba(0,0,0,0.12)]">
         <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">
           <div className="flex items-center gap-2">
-            <Icon size={16} className="text-blue-600" />
+            <Icon size={17} className="text-blue-600" />
 
             <span className="text-sm font-bold text-gray-900">
               {category.name}
@@ -456,7 +435,7 @@ const CategoryDropdown = ({ category, onClose }) => {
           </Link>
         </div>
 
-        <div className="max-h-[280px] overflow-y-auto p-2">
+        <div className="max-h-[300px] overflow-y-auto p-2">
           {category.featured.map((item) => (
             <Link
               key={item}
@@ -465,10 +444,8 @@ const CategoryDropdown = ({ category, onClose }) => {
               className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[13px] font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
             >
               {item}
-              <ArrowRight
-                size={13}
-                className="text-gray-300"
-              />
+
+              <ArrowRight size={13} className="text-gray-300" />
             </Link>
           ))}
         </div>
@@ -477,9 +454,9 @@ const CategoryDropdown = ({ category, onClose }) => {
   );
 };
 
-// ---------------------------------------------
+// =============================================
 // MAIN NAVBAR
-// ---------------------------------------------
+// =============================================
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -489,10 +466,44 @@ const Navbar = () => {
   const [showMore, setShowMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [navWidth, setNavWidth] = useState(0);
+  const [cartCount, setCartCount] = useState(getCartCount);
 
   const navRef = useRef(null);
 
-  // Measure available navbar width.
+  // ---------------------------------------------
+  // CART COUNT SYNCHRONIZATION
+  // ---------------------------------------------
+
+  useEffect(() => {
+    const syncCartCount = (event) => {
+      if (event.type === "cart-updated" && event.detail) {
+        const count = event.detail.reduce(
+          (total, item) =>
+            total + Math.max(0, Number(item.quantity) || 0),
+          0
+        );
+
+        setCartCount(count);
+      } else {
+        setCartCount(getCartCount());
+      }
+    };
+
+    window.addEventListener("cart-updated", syncCartCount);
+    window.addEventListener("storage", syncCartCount);
+    window.addEventListener("focus", syncCartCount);
+
+    return () => {
+      window.removeEventListener("cart-updated", syncCartCount);
+      window.removeEventListener("storage", syncCartCount);
+      window.removeEventListener("focus", syncCartCount);
+    };
+  }, []);
+
+  // ---------------------------------------------
+  // RESPONSIVE CATEGORY WIDTH
+  // ---------------------------------------------
+
   useEffect(() => {
     const navElement = navRef.current;
 
@@ -504,18 +515,25 @@ const Navbar = () => {
 
     updateWidth();
 
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateWidth);
+
+      return () => {
+        window.removeEventListener("resize", updateWidth);
+      };
+    }
+
     const observer = new ResizeObserver(updateWidth);
     observer.observe(navElement);
 
     return () => observer.disconnect();
   }, []);
 
-  // Calculate how many categories can fit.
   const visibleCount = useMemo(() => {
     if (!navWidth) return 6;
 
     const estimatedWidths = categories.map(
-      (category) => category.name.length * 6.3 + 43
+      (category) => category.name.length * 6.3 + 48
     );
 
     const totalWidth = estimatedWidths.reduce(
@@ -527,7 +545,7 @@ const Navbar = () => {
       return categories.length;
     }
 
-    const availableWidth = navWidth - 68; // Reserve space for More.
+    const availableWidth = navWidth - 75;
 
     let usedWidth = 0;
     let count = 0;
@@ -544,6 +562,10 @@ const Navbar = () => {
 
   const visibleCategories = categories.slice(0, visibleCount);
   const moreCategories = categories.slice(visibleCount);
+
+  // ---------------------------------------------
+  // NAVIGATION HELPERS
+  // ---------------------------------------------
 
   const closeMenus = () => {
     setIsMenuOpen(false);
@@ -566,20 +588,32 @@ const Navbar = () => {
     setShowMore(false);
   };
 
+  const handleCategoryHover = (name) => {
+    setActiveCategory(name);
+    setShowMore(false);
+  };
+
+  // =============================================
+  // RENDER
+  // =============================================
+
   return (
     <header className="sticky top-0 z-50 bg-white">
       {/* =========================================
           TOP NAVBAR
       ========================================= */}
+
       <div className="border-b border-gray-100">
         <div className="mx-auto flex h-[68px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:gap-5 lg:px-7">
+
           {/* Logo */}
           <Link
             to="/"
             onClick={closeMenus}
+            aria-label="GadgetGoods Home"
             className="flex shrink-0 items-center gap-2"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200">
               <Smartphone size={21} strokeWidth={2.2} />
             </div>
 
@@ -610,35 +644,28 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Actions */}
+          {/* Action Buttons */}
           <div className="ml-auto flex shrink-0 items-center gap-0.5 lg:ml-0">
+
+            {/* Wishlist */}
             <Link
               to="/wishlist"
               aria-label="Wishlist"
               title="Wishlist"
-              className="rounded-full p-2.5 text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
             >
               <Heart size={20} strokeWidth={1.8} />
             </Link>
 
-            <Link
-              to="/cart"
-              aria-label="Shopping cart"
-              title="Shopping cart"
-              className="relative rounded-full p-2.5 text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
-            >
-              <ShoppingCart size={20} strokeWidth={1.8} />
+            {/* Cart with Dynamic Badge */}
+            <CartButton count={cartCount} />
 
-              <span className="absolute right-0 top-0 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
-                0
-              </span>
-            </Link>
-
+            {/* Account */}
             <Link
               to="/login"
               aria-label="Sign in"
               title="Sign in"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
             >
               <UserRound size={19} strokeWidth={1.8} />
             </Link>
@@ -649,13 +676,9 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen((prev) => !prev)}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMenuOpen}
-              className="rounded-full p-2 text-gray-700 transition hover:bg-gray-100 lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition hover:bg-gray-100 lg:hidden"
             >
-              {isMenuOpen ? (
-                <X size={22} />
-              ) : (
-                <Menu size={22} />
-              )}
+              {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
@@ -672,8 +695,9 @@ const Navbar = () => {
       </div>
 
       {/* =========================================
-          DESKTOP CATEGORY NAVBAR
+          DESKTOP CATEGORY NAVIGATION
       ========================================= */}
+
       <div
         className="relative hidden border-b border-gray-100 bg-white lg:block"
         onMouseLeave={() => {
@@ -683,7 +707,8 @@ const Navbar = () => {
       >
         <nav
           ref={navRef}
-          className="mx-auto flex h-[40px] max-w-[1440px] items-center justify-between gap-0 px-4 sm:px-6 lg:px-7"
+          aria-label="Product categories"
+          className="mx-auto flex h-[42px] max-w-[1440px] items-center justify-between gap-0 px-4 sm:px-6 lg:px-7"
         >
           {/* Visible Categories */}
           <div className="flex h-full min-w-0 items-center gap-0">
@@ -695,17 +720,12 @@ const Navbar = () => {
                 <div
                   key={category.name}
                   className="relative flex h-full shrink-0 items-center"
-                  onMouseEnter={() => {
-                    setActiveCategory(category.name);
-                    setShowMore(false);
-                  }}
+                  onMouseEnter={() => handleCategoryHover(category.name)}
                 >
                   <Link
                     to={category.path}
-                    onFocus={() => {
-                      setActiveCategory(category.name);
-                      setShowMore(false);
-                    }}
+                    onFocus={() => handleCategoryHover(category.name)}
+                    aria-expanded={isActive}
                     className={`flex h-full items-center gap-1 whitespace-nowrap border-b-2 px-2 text-[11px] font-semibold transition xl:px-2.5 xl:text-xs ${
                       isActive
                         ? "border-blue-600 text-blue-600"
@@ -760,6 +780,7 @@ const Navbar = () => {
               >
                 <MoreHorizontal size={16} />
                 More
+
                 <ChevronDown
                   size={11}
                   className={`transition-transform duration-200 ${
@@ -769,7 +790,7 @@ const Navbar = () => {
               </button>
 
               {showMore && (
-                <div className="absolute right-0 top-full z-50 w-[220px] pt-1.5">
+                <div className="absolute right-0 top-full z-50 w-[225px] pt-1.5">
                   <div className="overflow-hidden rounded-xl border border-gray-100 bg-white p-2 shadow-xl">
                     <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-gray-400">
                       More Categories
@@ -801,8 +822,10 @@ const Navbar = () => {
       {/* =========================================
           MOBILE NAVIGATION
       ========================================= */}
+
       {isMenuOpen && (
-        <div className="max-h-[calc(100vh-125px)] overflow-y-auto border-t border-gray-100 bg-white shadow-xl lg:hidden">
+        <div className="max-h-[calc(100dvh-125px)] overflow-y-auto border-t border-gray-100 bg-white shadow-xl lg:hidden">
+
           {/* Quick Links */}
           <div className="grid grid-cols-3 gap-2 border-b border-gray-100 p-4">
             {quickLinks.map(({ name, path, icon: Icon }) => (
@@ -876,10 +899,11 @@ const Navbar = () => {
 
           {/* Account, Wishlist & Cart */}
           <div className="border-t border-gray-100 p-4">
+
             <Link
               to="/login"
               onClick={closeMenus}
-              className="mb-2 flex items-center gap-3 rounded-xl bg-gray-900 px-3 py-3 text-sm font-semibold text-white"
+              className="mb-2 flex items-center gap-3 rounded-xl bg-gray-900 px-3 py-3 text-sm font-semibold text-white transition hover:bg-black"
             >
               <UserRound size={19} />
               Sign In / Login
@@ -888,7 +912,7 @@ const Navbar = () => {
             <Link
               to="/wishlist"
               onClick={closeMenus}
-              className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+              className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
             >
               <Heart size={19} />
               My Wishlist
@@ -897,10 +921,18 @@ const Navbar = () => {
             <Link
               to="/cart"
               onClick={closeMenus}
-              className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+              className="flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
             >
-              <ShoppingCart size={19} />
-              Shopping Cart
+              <span className="flex items-center gap-3">
+                <ShoppingCart size={19} />
+                Shopping Cart
+              </span>
+
+              {cartCount > 0 && (
+                <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-bold text-white">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>
