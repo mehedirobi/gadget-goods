@@ -42,7 +42,7 @@ const categories = [
   {
     name: "Phones",
     icon: Smartphone,
-    path: "/shop?category=phones",
+    path: "/shop?category=Phones",
     featured: [
       "iPhone", "Samsung", "Google", "Xiaomi", "OnePlus",
       "Nothing", "Realme", "OPPO", "Vivo", "Motorola",
@@ -51,7 +51,7 @@ const categories = [
   {
     name: "Tablets",
     icon: Tablet,
-    path: "/shop?category=tablets",
+    path: "/shop?category=Tablets",
     featured: [
       "iPad", "Samsung", "Xiaomi", "Lenovo",
       "Android Tablets", "Drawing Tablets",
@@ -60,7 +60,7 @@ const categories = [
   {
     name: "Laptops",
     icon: Laptop,
-    path: "/shop?category=laptops",
+    path: "/shop?category=Laptops",
     featured: [
       "Apple MacBook", "ASUS", "HP", "Dell",
       "Lenovo", "Acer", "MSI", "Gaming Laptops",
@@ -69,7 +69,7 @@ const categories = [
   {
     name: "Desktops",
     icon: Monitor,
-    path: "/shop?category=desktops",
+    path: "/shop?category=Desktops",
     featured: [
       "Desktop PCs", "All-in-One PCs", "Mini PCs",
       "Workstations", "Branded PCs", "Custom PCs",
@@ -78,7 +78,7 @@ const categories = [
   {
     name: "Gadgets",
     icon: Headphones,
-    path: "/shop?category=gadgets",
+    path: "/shop?category=Gadgets",
     featured: [
       "Earbuds", "Headphones", "Speakers", "Power Banks",
       "Chargers", "Smart Watches", "Bluetooth Gadgets", "Smart Home",
@@ -87,7 +87,7 @@ const categories = [
   {
     name: "PC Components",
     icon: Monitor,
-    path: "/shop?category=pc-components",
+    path: "/shop?category=PC%20Components",
     featured: [
       "Processors", "Graphics Cards", "Motherboards", "RAM",
       "SSD & HDD", "Power Supplies", "PC Cases", "Cooling Systems",
@@ -96,7 +96,7 @@ const categories = [
   {
     name: "Accessories",
     icon: Package,
-    path: "/shop?category=accessories",
+    path: "/shop?category=Accessories",
     featured: [
       "Keyboards", "Mouse", "Mouse Pads", "Monitors",
       "USB Hubs", "Cables & Adapters", "Laptop Stands", "Webcams",
@@ -105,7 +105,7 @@ const categories = [
   {
     name: "Gaming",
     icon: Gamepad2,
-    path: "/shop?category=gaming",
+    path: "/shop?category=Gaming",
     featured: [
       "Gaming Consoles", "PlayStation", "Xbox", "Nintendo",
       "Gaming Controllers", "Gaming Headsets",
@@ -115,7 +115,7 @@ const categories = [
   {
     name: "Smartwatches",
     icon: Watch,
-    path: "/shop?category=smartwatches",
+    path: "/shop?category=Smartwatches",
     featured: [
       "Apple Watch", "Samsung Watch", "Xiaomi Watch",
       "Amazfit", "Fitness Bands", "Smart Bands",
@@ -124,7 +124,7 @@ const categories = [
   {
     name: "Cameras",
     icon: Camera,
-    path: "/shop?category=cameras",
+    path: "/shop?category=Cameras",
     featured: [
       "DSLR Cameras", "Mirrorless Cameras", "Action Cameras",
       "Digital Cameras", "Camera Lenses", "Camera Accessories",
@@ -133,7 +133,7 @@ const categories = [
   {
     name: "Networking",
     icon: Wifi,
-    path: "/shop?category=networking",
+    path: "/shop?category=Networking",
     featured: [
       "WiFi Routers", "Mesh Routers", "Network Switches",
       "Access Points", "WiFi Adapters", "Network Accessories",
@@ -142,7 +142,7 @@ const categories = [
   {
     name: "Appliances",
     icon: Home,
-    path: "/shop?category=appliances",
+    path: "/shop?category=Appliances",
     featured: [
       "Air Conditioners", "Refrigerators", "Air Purifiers",
       "Kitchen Appliances", "Home Appliances", "Smart Home Devices",
@@ -159,6 +159,9 @@ const quickLinks = [
 // =============================================
 // HELPERS
 // =============================================
+
+const getCategoryPath = (categoryName) =>
+  `/shop?category=${encodeURIComponent(categoryName)}`;
 
 const getCartCount = () => {
   try {
@@ -602,6 +605,7 @@ const SearchBox = ({
 
 const CategoryDropdown = ({ category, onClose }) => {
   const Icon = category.icon;
+  const categoryPath = getCategoryPath(category.name);
 
   return (
     <div className="absolute left-0 top-full z-50 w-[245px] pt-1.5">
@@ -616,7 +620,7 @@ const CategoryDropdown = ({ category, onClose }) => {
           </div>
 
           <Link
-            to={category.path}
+            to={categoryPath}
             onClick={onClose}
             className="text-[11px] font-semibold text-blue-600 hover:text-blue-700"
           >
@@ -628,7 +632,7 @@ const CategoryDropdown = ({ category, onClose }) => {
           {category.featured.map((item) => (
             <Link
               key={item}
-              to={category.path}
+              to={categoryPath}
               onClick={onClose}
               className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[13px] font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
             >
@@ -946,7 +950,7 @@ const Navbar = () => {
                   }
                 >
                   <Link
-                    to={category.path}
+                    to={getCategoryPath(category.name)}
                     onFocus={() =>
                       handleCategoryHover(category.name)
                     }
@@ -1029,7 +1033,7 @@ const Navbar = () => {
                       return (
                         <Link
                           key={category.name}
-                          to={category.path}
+                          to={getCategoryPath(category.name)}
                           onClick={closeMenus}
                           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
                         >
@@ -1105,7 +1109,7 @@ const Navbar = () => {
                         {category.featured.map((item) => (
                           <Link
                             key={item}
-                            to={category.path}
+                            to={getCategoryPath(category.name)}
                             onClick={closeMenus}
                             className="rounded-lg px-3 py-2 text-xs text-gray-500 transition hover:bg-blue-50 hover:text-blue-600"
                           >
@@ -1124,7 +1128,6 @@ const Navbar = () => {
           <div className="border-t border-gray-100 p-4">
             {user ? (
               <>
-                {/* User Information */}
                 <div className="mb-3 flex items-center gap-3 rounded-xl bg-gray-50 p-3">
                   <UserAvatar user={user} size="large" />
 
@@ -1139,7 +1142,6 @@ const Navbar = () => {
                   </div>
                 </div>
 
-                {/* Logout */}
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -1169,7 +1171,6 @@ const Navbar = () => {
               </Link>
             )}
 
-            {/* Wishlist */}
             <Link
               to="/wishlist"
               onClick={closeMenus}
@@ -1179,7 +1180,6 @@ const Navbar = () => {
               My Wishlist
             </Link>
 
-            {/* Shopping Cart */}
             <Link
               to="/cart"
               onClick={closeMenus}
