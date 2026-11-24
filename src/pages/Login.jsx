@@ -21,6 +21,7 @@ import {
 
 import { auth } from "../firebase/firebase.config";
 import AuthLayout, { GoogleButton } from "../components/AuthLayout";
+import { useToast } from "../contexts/ToastContext";
 
 const initialFormData = {
   email: "",
@@ -80,6 +81,9 @@ const getAuthErrorMessage = (error) => {
 const Login = () => {
   const navigate = useNavigate();
 
+  // Global toast notification
+  const { showToast } = useToast();
+
   const [formData, setFormData] = useState(initialFormData);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -92,6 +96,16 @@ const Login = () => {
   });
 
   const isBusy = isSubmitting || googleLoading;
+
+  // Show inline feedback and toast
+  const showError = (message, type = "error") => {
+    setFeedback({
+      type,
+      text: message,
+    });
+
+    showToast(message, type === "warning" ? "warning" : "error");
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -117,10 +131,10 @@ const Login = () => {
     const password = formData.password;
 
     if (!email || !password) {
-      setFeedback({
-        type: "error",
-        text: "Please enter your email and password.",
-      });
+      showError(
+        "Please enter your email and password.",
+        "warning"
+      );
       return;
     }
 
@@ -144,15 +158,14 @@ const Login = () => {
 
       console.log("Logged in user:", userCredential.user);
 
+      showToast("Welcome back! Login successful.", "success");
+
       // Redirect after successful login
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Email Login Error:", error);
 
-      setFeedback({
-        type: "error",
-        text: getAuthErrorMessage(error),
-      });
+      showError(getAuthErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -177,15 +190,17 @@ const Login = () => {
 
       console.log("Google logged in user:", userCredential.user);
 
+      showToast("Welcome! Google sign-in successful.", "success");
+
       // Redirect after successful login
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Google Login Error:", error);
 
-      setFeedback({
-        type: "error",
-        text: getAuthErrorMessage(error),
-      });
+      // Avoid showing an error when the user intentionally closes the popup
+      const message = getAuthErrorMessage(error);
+
+      showError(message);
     } finally {
       setGoogleLoading(false);
     }
@@ -320,12 +335,16 @@ const Login = () => {
           Remember me
         </label>
 
-        {/* Feedback */}
+        {/* Inline feedback */}
         {feedback.text && (
           <div
             role="alert"
             aria-live="polite"
-            className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+            className={`flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm leading-6 ${
+              feedback.type === "warning"
+                ? "border-amber-100 bg-amber-50 text-amber-700"
+                : "border-red-100 bg-red-50 text-red-700"
+            }`}
           >
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
             <p>{feedback.text}</p>

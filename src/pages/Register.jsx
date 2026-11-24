@@ -23,6 +23,7 @@ import {
 
 import { auth } from "../firebase/firebase.config";
 import AuthLayout, { GoogleButton } from "../components/AuthLayout";
+import { useToast } from "../contexts/ToastContext";
 
 // Password strength
 const getPasswordStrength = (password) => {
@@ -44,22 +45,31 @@ const getAuthErrorMessage = (error) => {
   const errorMessages = {
     "auth/email-already-in-use":
       "An account with this email already exists. Please sign in.",
+
     "auth/invalid-email":
       "Please enter a valid email address.",
+
     "auth/weak-password":
       "Your password is too weak. Please choose a stronger password.",
+
     "auth/operation-not-allowed":
       "This sign-up method is currently disabled. Please contact support.",
+
     "auth/popup-closed-by-user":
       "Google sign-up was cancelled. Please try again.",
+
     "auth/popup-blocked":
       "Your browser blocked the Google sign-in popup. Please allow popups and try again.",
+
     "auth/cancelled-popup-request":
       "Another sign-in popup is already open.",
+
     "auth/account-exists-with-different-credential":
       "An account already exists with this email using another sign-in method. Please sign in with that method.",
+
     "auth/network-request-failed":
       "Network error. Please check your internet connection.",
+
     "auth/unauthorized-domain":
       "This domain is not authorized for Firebase Authentication.",
   };
@@ -86,6 +96,9 @@ const initialFormData = {
 const Register = () => {
   const navigate = useNavigate();
 
+  // Global toast notification
+  const { showToast } = useToast();
+
   const [formData, setFormData] = useState(initialFormData);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -100,6 +113,16 @@ const Register = () => {
   });
 
   const isBusy = isSubmitting || googleLoading;
+
+  // Show inline feedback and toast
+  const showError = (message, type = "error") => {
+    setFeedback({
+      type,
+      text: message,
+    });
+
+    showToast(message, type === "warning" ? "warning" : "error");
+  };
 
   // Password strength
   const passwordStrength = useMemo(
@@ -172,35 +195,39 @@ const Register = () => {
     const email = formData.email.trim().toLowerCase();
     const password = formData.password;
 
+    // Name validation
     if (name.length < 2) {
-      setFeedback({
-        type: "error",
-        text: "Please enter your full name (at least 2 characters).",
-      });
+      showError(
+        "Please enter your full name (at least 2 characters).",
+        "warning"
+      );
       return;
     }
 
+    // Password validation
     if (passwordStrength < 4) {
-      setFeedback({
-        type: "error",
-        text: "Please choose a stronger password.",
-      });
+      showError(
+        "Please choose a stronger password.",
+        "warning"
+      );
       return;
     }
 
+    // Confirm password validation
     if (password !== formData.confirmPassword) {
-      setFeedback({
-        type: "error",
-        text: "Your passwords do not match.",
-      });
+      showError(
+        "Your passwords do not match.",
+        "warning"
+      );
       return;
     }
 
+    // Terms validation
     if (!formData.agreeToTerms) {
-      setFeedback({
-        type: "error",
-        text: "Please accept the Terms & Conditions to continue.",
-      });
+      showError(
+        "Please accept the Terms & Conditions to continue.",
+        "warning"
+      );
       return;
     }
 
@@ -219,15 +246,20 @@ const Register = () => {
         displayName: name,
       });
 
+      // Update Firebase user's profile locally
+      await userCredential.user.reload();
+
+      showToast(
+        `Welcome to GadgetGoods, ${name}! Your account has been created.`,
+        "success"
+      );
+
       // Redirect after successful registration
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Email Registration Error:", error);
 
-      setFeedback({
-        type: "error",
-        text: getAuthErrorMessage(error),
-      });
+      showError(getAuthErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -248,17 +280,22 @@ const Register = () => {
       });
 
       // Open Google account popup
-      await signInWithPopup(auth, provider);
+      const userCredential = await signInWithPopup(auth, provider);
+
+      const userName =
+        userCredential.user.displayName || "there";
+
+      showToast(
+        `Welcome to GadgetGoods, ${userName}!`,
+        "success"
+      );
 
       // Redirect after successful authentication
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Google Registration Error:", error);
 
-      setFeedback({
-        type: "error",
-        text: getAuthErrorMessage(error),
-      });
+      showError(getAuthErrorMessage(error));
     } finally {
       setGoogleLoading(false);
     }
@@ -586,12 +623,16 @@ const Register = () => {
           </span>
         </label>
 
-        {/* Feedback */}
+        {/* Inline feedback */}
         {feedback.text && (
           <div
-            role={feedback.type === "error" ? "alert" : "status"}
+            role="alert"
             aria-live="polite"
-            className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+            className={`flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm leading-6 ${
+              feedback.type === "warning"
+                ? "border-amber-100 bg-amber-50 text-amber-700"
+                : "border-red-100 bg-red-50 text-red-700"
+            }`}
           >
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
             <p>{feedback.text}</p>

@@ -25,14 +25,12 @@ import {
   MoreHorizontal,
   ArrowRight,
   LogOut,
-  Settings,
-  User,
-  LayoutDashboard,
   LoaderCircle,
 } from "lucide-react";
 
 import { products } from "../data/products";
 import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "../contexts/ToastContext";
 
 const CART_KEY = "gadgetgoods-cart";
 
@@ -178,23 +176,22 @@ const getCartCount = () => {
   }
 };
 
-const getUserName = (user) => {
-  return (
-    user?.displayName ||
-    user?.email?.split("@")[0] ||
-    "My Account"
-  );
-};
+const getUserName = (user) =>
+  user?.displayName ||
+  user?.email?.split("@")[0] ||
+  "My Account";
 
 const getUserInitials = (user) => {
   const name = getUserName(user);
 
-  return name
-    .split(/[\s._-]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("") || "U";
+  return (
+    name
+      .split(/[\s._-]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "U"
+  );
 };
 
 // =============================================
@@ -217,6 +214,46 @@ const BrandLogo = ({ onClick }) => (
     </span>
   </Link>
 );
+
+// =============================================
+// USER AVATAR
+// =============================================
+
+const UserAvatar = ({ user, size = "normal" }) => {
+  const [imageError, setImageError] = useState(false);
+
+  const photoURL = user?.photoURL;
+
+  const sizeClass =
+    size === "large"
+      ? "h-11 w-11 text-sm"
+      : "h-9 w-9 text-xs";
+
+  useEffect(() => {
+    setImageError(false);
+  }, [photoURL]);
+
+  if (photoURL && !imageError) {
+    return (
+      <img
+        src={photoURL}
+        alt={`${getUserName(user)} profile`}
+        referrerPolicy="no-referrer"
+        onError={() => setImageError(true)}
+        className={`${sizeClass} shrink-0 rounded-full border border-gray-200 object-cover`}
+      />
+    );
+  }
+
+  return (
+    <div
+      aria-label={`${getUserName(user)} avatar`}
+      className={`${sizeClass} flex shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700`}
+    >
+      {getUserInitials(user)}
+    </div>
+  );
+};
 
 // =============================================
 // CART BUTTON
@@ -243,42 +280,6 @@ const CartButton = ({ count, onClick, mobile = false }) => (
 );
 
 // =============================================
-// USER AVATAR
-// =============================================
-
-const UserAvatar = ({ user, size = "normal" }) => {
-  const [imageError, setImageError] = useState(false);
-
-  const photoURL = user?.photoURL;
-
-  const sizeClass =
-    size === "large"
-      ? "h-11 w-11 text-sm"
-      : "h-9 w-9 text-xs";
-
-  if (photoURL && !imageError) {
-    return (
-      <img
-        src={photoURL}
-        alt={`${getUserName(user)} profile`}
-        referrerPolicy="no-referrer"
-        onError={() => setImageError(true)}
-        className={`${sizeClass} shrink-0 rounded-full border border-gray-200 object-cover`}
-      />
-    );
-  }
-
-  return (
-    <div
-      className={`${sizeClass} flex shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700`}
-      aria-label={`${getUserName(user)} avatar`}
-    >
-      {getUserInitials(user)}
-    </div>
-  );
-};
-
-// =============================================
 // USER ACCOUNT DROPDOWN
 // =============================================
 
@@ -297,7 +298,9 @@ const UserAccount = ({ user, onLogout, loggingOut }) => {
     };
 
     const handleEscape = (event) => {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
     };
 
     document.addEventListener("pointerdown", handleOutsideClick);
@@ -324,7 +327,10 @@ const UserAccount = ({ user, onLogout, loggingOut }) => {
           <p className="truncate text-xs font-bold text-gray-800">
             {getUserName(user)}
           </p>
-          <p className="text-[10px] text-gray-400">My Account</p>
+
+          <p className="text-[10px] text-gray-400">
+            My Account
+          </p>
         </div>
 
         <ChevronDown
@@ -345,43 +351,15 @@ const UserAccount = ({ user, onLogout, loggingOut }) => {
                 <p className="truncate text-sm font-bold text-gray-900">
                   {getUserName(user)}
                 </p>
+
                 <p className="truncate text-xs text-gray-500">
-                  {user?.email}
+                  {user?.email || "Signed in"}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-1 p-2">
-            <Link
-              to="/profile"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
-            >
-              <User size={17} />
-              My Profile
-            </Link>
-
-            <Link
-              to="/dashboard"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
-            >
-              <LayoutDashboard size={17} />
-              Dashboard
-            </Link>
-
-            <Link
-              to="/settings"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-blue-50 hover:text-blue-600"
-            >
-              <Settings size={17} />
-              Settings
-            </Link>
-          </div>
-
-          <div className="border-t border-gray-100 p-2">
+          <div className="p-2">
             <button
               type="button"
               onClick={() => {
@@ -396,6 +374,7 @@ const UserAccount = ({ user, onLogout, loggingOut }) => {
               ) : (
                 <LogOut size={17} />
               )}
+
               {loggingOut ? "Signing out..." : "Logout"}
             </button>
           </div>
@@ -451,7 +430,9 @@ const SearchBox = ({
     };
 
     const handleEscape = (event) => {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
     };
 
     document.addEventListener("pointerdown", handleOutsideClick);
@@ -466,10 +447,12 @@ const SearchBox = ({
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!query.trim()) return;
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery) return;
 
     setIsOpen(false);
-    onSearch(query.trim());
+    onSearch(trimmedQuery);
   };
 
   const handleProductSelect = (product) => {
@@ -665,9 +648,8 @@ const CategoryDropdown = ({ category, onClose }) => {
 
 const Navbar = () => {
   const navigate = useNavigate();
-
-  // Firebase authentication state
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -679,9 +661,9 @@ const Navbar = () => {
 
   const navRef = useRef(null);
 
-  // ---------------------------------------------
+  // =============================================
   // CART COUNT SYNCHRONIZATION
-  // ---------------------------------------------
+  // =============================================
 
   useEffect(() => {
     const syncCartCount = (event) => {
@@ -696,9 +678,10 @@ const Navbar = () => {
         );
 
         setCartCount(count);
-      } else {
-        setCartCount(getCartCount());
+        return;
       }
+
+      setCartCount(getCartCount());
     };
 
     window.addEventListener("cart-updated", syncCartCount);
@@ -712,9 +695,9 @@ const Navbar = () => {
     };
   }, []);
 
-  // ---------------------------------------------
+  // =============================================
   // RESPONSIVE CATEGORY WIDTH
-  // ---------------------------------------------
+  // =============================================
 
   useEffect(() => {
     const navElement = navRef.current;
@@ -736,6 +719,7 @@ const Navbar = () => {
     }
 
     const observer = new ResizeObserver(updateWidth);
+
     observer.observe(navElement);
 
     return () => observer.disconnect();
@@ -766,9 +750,9 @@ const Navbar = () => {
   const visibleCategories = categories.slice(0, visibleCount);
   const moreCategories = categories.slice(visibleCount);
 
-  // ---------------------------------------------
+  // =============================================
   // NAVIGATION HELPERS
-  // ---------------------------------------------
+  // =============================================
 
   const closeMenus = () => {
     setIsMenuOpen(false);
@@ -777,10 +761,15 @@ const Navbar = () => {
   };
 
   const handleSearch = (query) => {
-    if (!query.trim()) return;
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery) return;
 
     closeMenus();
-    navigate(`/shop?search=${encodeURIComponent(query)}`);
+
+    navigate(
+      `/shop?search=${encodeURIComponent(trimmedQuery)}`
+    );
   };
 
   const toggleCategory = (name) => {
@@ -796,37 +785,42 @@ const Navbar = () => {
     setShowMore(false);
   };
 
-  // ---------------------------------------------
-  // LOGOUT
-  // ---------------------------------------------
+  // =============================================
+  // LOGOUT WITH TOAST NOTIFICATION
+  // =============================================
 
   const handleLogout = async () => {
     if (loggingOut) return;
 
-    try {
-      setLoggingOut(true);
-      closeMenus();
+    setLoggingOut(true);
+    closeMenus();
 
+    try {
       await logout();
+
+      showToast("Logged out successfully!", "success");
 
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Logout failed:", error);
+
+      showToast(
+        error?.message || "Logout failed. Please try again.",
+        "error"
+      );
     } finally {
       setLoggingOut(false);
     }
   };
 
-  // ---------------------------------------------
-  // CLOSE MOBILE MENU ON ESCAPE
-  // ---------------------------------------------
+  // =============================================
+  // ESCAPE KEY
+  // =============================================
 
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape") {
-        setIsMenuOpen(false);
-        setActiveCategory(null);
-        setShowMore(false);
+        closeMenus();
       }
     };
 
@@ -837,19 +831,15 @@ const Navbar = () => {
     };
   }, []);
 
-  // ---------------------------------------------
+  // =============================================
   // RENDER
-  // ---------------------------------------------
+  // =============================================
 
   return (
     <header className="sticky top-0 z-50 bg-white">
-      {/* =========================================
-          TOP NAVBAR
-      ========================================= */}
-
+      {/* TOP NAVBAR */}
       <div className="border-b border-gray-100">
         <div className="mx-auto flex h-[68px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:gap-5 lg:px-7">
-          {/* Logo */}
           <BrandLogo onClick={closeMenus} />
 
           {/* Desktop Search */}
@@ -876,7 +866,6 @@ const Navbar = () => {
 
           {/* Action Buttons */}
           <div className="ml-auto flex shrink-0 items-center gap-0.5 lg:ml-0">
-            {/* Wishlist */}
             <Link
               to="/wishlist"
               aria-label="Wishlist"
@@ -886,7 +875,6 @@ const Navbar = () => {
               <Heart size={20} strokeWidth={1.8} />
             </Link>
 
-            {/* Cart */}
             <CartButton count={cartCount} />
 
             {/* Account */}
@@ -931,10 +919,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* =========================================
-          DESKTOP CATEGORY NAVIGATION
-      ========================================= */}
-
+      {/* DESKTOP CATEGORY NAVIGATION */}
       <div
         className="relative hidden border-b border-gray-100 bg-white lg:block"
         onMouseLeave={() => {
@@ -1006,7 +991,9 @@ const Navbar = () => {
             >
               <button
                 type="button"
-                onClick={() => setShowMore((previous) => !previous)}
+                onClick={() =>
+                  setShowMore((previous) => !previous)
+                }
                 onFocus={() => {
                   setActiveCategory(null);
                   setShowMore(true);
@@ -1059,10 +1046,7 @@ const Navbar = () => {
         </nav>
       </div>
 
-      {/* =========================================
-          MOBILE NAVIGATION
-      ========================================= */}
-
+      {/* MOBILE NAVIGATION */}
       {isMenuOpen && (
         <div className="max-h-[calc(100dvh-125px)] overflow-y-auto border-t border-gray-100 bg-white shadow-xl lg:hidden">
           {/* Quick Links */}
@@ -1136,10 +1120,11 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Account */}
+          {/* MOBILE ACCOUNT */}
           <div className="border-t border-gray-100 p-4">
             {user ? (
               <>
+                {/* User Information */}
                 <div className="mb-3 flex items-center gap-3 rounded-xl bg-gray-50 p-3">
                   <UserAvatar user={user} size="large" />
 
@@ -1147,31 +1132,31 @@ const Navbar = () => {
                     <p className="truncate text-sm font-bold text-gray-900">
                       {getUserName(user)}
                     </p>
+
                     <p className="truncate text-xs text-gray-500">
-                      {user.email}
+                      {user.email || "Signed in"}
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    disabled={loggingOut}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
-                  >
-                    {loggingOut ? (
-                      <LoaderCircle
-                        size={18}
-                        className="animate-spin"
-                      />
-                    ) : (
-                      <LogOut size={18} />
-                    )}
-                    {loggingOut ? "Signing out..." : "Logout"}
-                  </button>
-                </div>
+                {/* Logout */}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {loggingOut ? (
+                    <LoaderCircle
+                      size={18}
+                      className="animate-spin"
+                    />
+                  ) : (
+                    <LogOut size={18} />
+                  )}
+
+                  {loggingOut ? "Signing out..." : "Logout"}
+                </button>
               </>
             ) : (
               <Link
@@ -1184,6 +1169,7 @@ const Navbar = () => {
               </Link>
             )}
 
+            {/* Wishlist */}
             <Link
               to="/wishlist"
               onClick={closeMenus}
@@ -1193,6 +1179,7 @@ const Navbar = () => {
               My Wishlist
             </Link>
 
+            {/* Shopping Cart */}
             <Link
               to="/cart"
               onClick={closeMenus}
