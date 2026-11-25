@@ -11,34 +11,129 @@ import {
 
 import {
   products,
-  brands,
   categoryConfig,
   categoryFilters,
   filterOptions,
 } from "../data/products";
 
-import { categories } from "../data/categories";
-
 import ProductCard from "../components/ProductCard";
 import ShopSidebar from "../components/ShopSidebar";
-import ShopToolbar from "../components/ShopToolbar";
 
 const DEFAULT_CATEGORY = "All Products";
 const DEFAULT_MAX_PRICE = 400000;
 
+// Navbar category name -> existing product category name.
+const CATEGORY_ALIASES = {
+  phones: ["Smartphones"],
+  smartphones: ["Smartphones"],
+
+  tablets: ["Tablets"],
+
+  laptops: ["Laptops"],
+
+  desktops: ["Desktop PCs", "Desktops"],
+  "desktop-pcs": ["Desktop PCs", "Desktops"],
+
+  gadgets: ["Accessories", "Smart Watches", "Smartwatches"],
+
+  "pc-components": ["PC Components"],
+
+  accessories: ["Accessories"],
+
+  gaming: ["Gaming"],
+
+  smartwatches: ["Smart Watches", "Smartwatches"],
+  "smart-watches": ["Smart Watches", "Smartwatches"],
+
+  cameras: ["Cameras"],
+  networking: ["Networking"],
+  appliances: ["Appliances"],
+};
+
+const CATEGORY_LABELS = {
+  phones: "Phones",
+  smartphones: "Phones",
+  tablets: "Tablets",
+  laptops: "Laptops",
+  desktops: "Desktops",
+  "desktop-pcs": "Desktops",
+  gadgets: "Gadgets",
+  "pc-components": "PC Components",
+  accessories: "Accessories",
+  gaming: "Gaming",
+  smartwatches: "Smartwatches",
+  "smart-watches": "Smartwatches",
+  cameras: "Cameras",
+  networking: "Networking",
+  appliances: "Appliances",
+};
+
+const SHOP_CATEGORIES = [
+  "Phones",
+  "Tablets",
+  "Laptops",
+  "Desktops",
+  "Gadgets",
+  "PC Components",
+  "Accessories",
+  "Gaming",
+  "Smartwatches",
+  "Cameras",
+  "Networking",
+  "Appliances",
+];
+
+const normalize = (value = "") =>
+  String(value).trim().toLowerCase().replace(/[\s_-]+/g, "");
+
+const getCategoryKey = (value = "") =>
+  String(value).trim().toLowerCase().replace(/\s+/g, "-");
+
+const getSelectedCategory = (categoryParam) => {
+  if (!categoryParam) return DEFAULT_CATEGORY;
+
+  const key = getCategoryKey(categoryParam);
+
+  return (
+    CATEGORY_LABELS[key] ||
+    SHOP_CATEGORIES.find(
+      (category) => normalize(category) === normalize(categoryParam)
+    ) ||
+    categoryParam
+  );
+};
+
+const getCategoryValues = (category) => {
+  const key = getCategoryKey(category);
+
+  return (
+    CATEGORY_ALIASES[key] ||
+    [category]
+  );
+};
+
+const getProductSearchText = (product) => {
+  const specifications = product.specifications || {};
+
+  return [
+    product.name,
+    product.brand,
+    product.category,
+    product.description,
+    ...Object.values(specifications),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+};
+
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // URL category validation
   const categoryParam = searchParams.get("category");
+  const selectedCategory = getSelectedCategory(categoryParam);
 
-  const selectedCategory = categories.some(
-    (category) => category.name === categoryParam
-  )
-    ? categoryParam
-    : DEFAULT_CATEGORY;
-
-  // States
+  // Filters and UI states.
   const [selectedFilters, setSelectedFilters] = useState({});
   const [selectedBrand, setSelectedBrand] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
@@ -50,7 +145,7 @@ const Shop = () => {
   const [sortBy, setSortBy] = useState("featured");
   const [viewMode, setViewMode] = useState("grid");
 
-  // Sync Navbar search with Shop search.
+  // Keep search input synchronized with URL.
   useEffect(() => {
     setSearch(searchParams.get("search") || "");
   }, [searchParams]);
@@ -59,18 +154,16 @@ const Shop = () => {
   useEffect(() => {
     setSelectedFilters({});
     setSelectedBrand([]);
+    setMinPrice(0);
+    setMaxPrice(DEFAULT_MAX_PRICE);
+    setExcludeOutOfStock(false);
   }, [selectedCategory]);
 
-  // Category banner information.
-  const categoryInfo =
-    categoryConfig[selectedCategory] ||
-    categoryConfig[DEFAULT_CATEGORY];
-
-  // Category-specific available filters.
-  const availableFilters =
-    selectedCategory === DEFAULT_CATEGORY
-      ? Object.keys(filterOptions)
-      : categoryFilters[selectedCategory] || [];
+  // Resolve actual product categories.
+  const matchedCategories = useMemo(
+    () => getCategoryValues(selectedCategory),
+    [selectedCategory]
+  );
 
   // Products belonging to selected category.
   const categoryProducts = useMemo(() => {
@@ -78,12 +171,45 @@ const Shop = () => {
       return [...products];
     }
 
-    return products.filter(
-      (product) => product.category === selectedCategory
-    );
-  }, [selectedCategory]);
+    const allowedCategories = matchedCategories.map(normalize);
 
-  // Available brands for selected category.
+    return products.filter((product) =>
+      allowedCategories.includes(normalize(product.category))
+    );
+  }, [selectedCategory, matchedCategories]);
+
+  // Category banner information.
+  const categoryInfo = useMemo(() => {
+    if (selectedCategory === DEFAULT_CATEGORY) {
+      return categoryConfig[DEFAULT_CATEGORY];
+    }
+
+    const matchedConfig = matchedCategories
+      .map((category) => categoryConfig[category])
+      .find(Boolean);
+
+    return matchedConfig || {
+      title: selectedCategory,
+      description:
+        "Explore our collection of premium electronics and technology products.",
+      image: categoryConfig[DEFAULT_CATEGORY]?.image,
+    };
+  }, [selectedCategory, matchedCategories]);
+
+  // Category-specific filters.
+  const availableFilters = useMemo(() => {
+    if (selectedCategory === DEFAULT_CATEGORY) {
+      return Object.keys(filterOptions);
+    }
+
+    const filters = matchedCategories.flatMap(
+      (category) => categoryFilters[category] || []
+    );
+
+    return [...new Set(filters)];
+  }, [selectedCategory, matchedCategories]);
+
+  // Available brands for current category.
   const availableBrands = useMemo(() => {
     const categoryBrands = categoryProducts
       .map((product) => product.brand)
@@ -99,15 +225,7 @@ const Shop = () => {
     const result = categoryProducts.filter((product) => {
       const specifications = product.specifications || {};
 
-      const searchableText = [
-        product.name,
-        product.brand,
-        product.category,
-        product.description,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+      const searchableText = getProductSearchText(product);
 
       const matchesSearch =
         !searchText || searchableText.includes(searchText);
@@ -129,7 +247,10 @@ const Shop = () => {
       ).every(([key, values]) => {
         if (!values?.length) return true;
 
-        return values.includes(specifications[key]);
+        return values.some(
+          (value) =>
+            normalize(specifications[key]) === normalize(value)
+        );
       });
 
       return (
@@ -143,11 +264,15 @@ const Shop = () => {
 
     switch (sortBy) {
       case "price-low":
-        result.sort((a, b) => a.price - b.price);
+        result.sort(
+          (a, b) => Number(a.price) - Number(b.price)
+        );
         break;
 
       case "price-high":
-        result.sort((a, b) => b.price - a.price);
+        result.sort(
+          (a, b) => Number(b.price) - Number(a.price)
+        );
         break;
 
       case "newest":
@@ -159,7 +284,10 @@ const Shop = () => {
         break;
 
       case "rating":
-        result.sort((a, b) => b.rating - a.rating);
+        result.sort(
+          (a, b) =>
+            Number(b.rating || 0) - Number(a.rating || 0)
+        );
         break;
 
       default:
@@ -185,8 +313,18 @@ const Shop = () => {
     if (category === DEFAULT_CATEGORY) {
       params.delete("category");
     } else {
-      params.set("category", category);
+      params.set("category", getCategoryKey(category));
     }
+
+    // Clear previous category search and filters.
+    params.delete("search");
+
+    setSearch("");
+    setSelectedFilters({});
+    setSelectedBrand([]);
+    setMinPrice(0);
+    setMaxPrice(DEFAULT_MAX_PRICE);
+    setExcludeOutOfStock(false);
 
     setSearchParams(params);
   };
@@ -207,7 +345,22 @@ const Shop = () => {
     });
   };
 
-  // Clear filters.
+  // Update search and URL together.
+  const updateSearch = (value) => {
+    setSearch(value);
+
+    const params = new URLSearchParams(searchParams);
+
+    if (value.trim()) {
+      params.set("search", value);
+    } else {
+      params.delete("search");
+    }
+
+    setSearchParams(params, { replace: true });
+  };
+
+  // Clear filters without removing the selected category.
   const clearFilters = () => {
     setSelectedFilters({});
     setSelectedBrand([]);
@@ -223,7 +376,9 @@ const Shop = () => {
     setSearchParams(params);
   };
 
-  // Active filters check.
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("en-BD").format(price);
+
   const hasActiveFilters =
     Object.values(selectedFilters).some(
       (values) => values.length > 0
@@ -233,13 +388,6 @@ const Shop = () => {
     maxPrice < DEFAULT_MAX_PRICE ||
     excludeOutOfStock ||
     search.trim().length > 0;
-
-  const removeSpecificationFilter = (key, value) => {
-    toggleFilter(key, value);
-  };
-
-  const formatPrice = (price) =>
-    new Intl.NumberFormat("en-BD").format(price);
 
   return (
     <main className="min-h-screen bg-[#f8fafc] pb-20 text-slate-900">
@@ -259,7 +407,12 @@ const Shop = () => {
 
             <ArrowRight size={13} className="text-slate-400" />
 
-            <span className="text-slate-500">Shop</span>
+            <Link
+              to="/shop"
+              className="text-slate-500 transition hover:text-blue-600"
+            >
+              Shop
+            </Link>
 
             {selectedCategory !== DEFAULT_CATEGORY && (
               <>
@@ -275,7 +428,7 @@ const Shop = () => {
       </div>
 
       <div className="mx-auto max-w-7xl px-5 pt-7 sm:px-8 sm:pt-10 lg:px-10">
-        {/* Dynamic Category Banner */}
+        {/* Category Banner */}
         <section
           className="relative isolate mb-8 flex min-h-[240px] items-center overflow-hidden rounded-2xl bg-slate-900 bg-cover bg-center px-6 py-10 sm:min-h-[280px] sm:px-10 lg:px-14"
           style={{
@@ -323,9 +476,10 @@ const Shop = () => {
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {[DEFAULT_CATEGORY, ...categories.map((item) => item.name)].map(
+            {[DEFAULT_CATEGORY, ...SHOP_CATEGORIES].map(
               (category) => {
-                const isActive = selectedCategory === category;
+                const isActive =
+                  selectedCategory === category;
 
                 return (
                   <button
@@ -372,16 +526,51 @@ const Shop = () => {
           {/* Product Section */}
           <section className="min-w-0">
             {/* Toolbar */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
-              <ShopToolbar
-                search={search}
-                setSearch={setSearch}
-                sortBy={sortBy}
-                setSortBy={setSortBy}
-                productCount={filteredProducts.length}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div>
+                <h2 className="text-sm font-bold text-slate-900">
+                  {selectedCategory === DEFAULT_CATEGORY
+                    ? "All Products"
+                    : selectedCategory}
+                </h2>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  Find the right product for your needs.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={sortBy}
+                  onChange={(event) =>
+                    setSortBy(event.target.value)
+                  }
+                  aria-label="Sort products"
+                  className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="featured">Featured</option>
+                  <option value="newest">Newest</option>
+                  <option value="price-low">
+                    Price: Low to High
+                  </option>
+                  <option value="price-high">
+                    Price: High to Low
+                  </option>
+                  <option value="rating">Top Rated</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setViewMode((current) =>
+                      current === "grid" ? "list" : "grid"
+                    )
+                  }
+                  className="h-10 rounded-lg border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-400 hover:text-blue-600"
+                >
+                  {viewMode === "grid" ? "List View" : "Grid View"}
+                </button>
+              </div>
             </div>
 
             {/* Active Filters */}
@@ -414,9 +603,7 @@ const Shop = () => {
                       <button
                         key={`${key}-${value}`}
                         type="button"
-                        onClick={() =>
-                          removeSpecificationFilter(key, value)
-                        }
+                        onClick={() => toggleFilter(key, value)}
                         className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
                       >
                         {value}
@@ -425,9 +612,11 @@ const Shop = () => {
                     ))
                 )}
 
-                {(minPrice > 0 || maxPrice < DEFAULT_MAX_PRICE) && (
+                {(minPrice > 0 ||
+                  maxPrice < DEFAULT_MAX_PRICE) && (
                   <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
-                    ৳{formatPrice(minPrice)} – ৳{formatPrice(maxPrice)}
+                    ৳{formatPrice(minPrice)} – ৳
+                    {formatPrice(maxPrice)}
                   </span>
                 )}
 
@@ -440,7 +629,7 @@ const Shop = () => {
                 {search.trim() && (
                   <button
                     type="button"
-                    onClick={() => setSearch("")}
+                    onClick={() => updateSearch("")}
                     className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
                   >
                     Search: {search}
@@ -504,8 +693,9 @@ const Shop = () => {
                 </h2>
 
                 <p className="mt-2 max-w-sm text-sm leading-7 text-slate-500">
-                  No products match your current search or filters.
-                  Try changing your selection or clearing the filters.
+                  {categoryProducts.length === 0
+                    ? `There are currently no products available in ${selectedCategory}.`
+                    : "No products match your current search or filters. Try changing your selection or clearing the filters."}
                 </p>
 
                 <button
