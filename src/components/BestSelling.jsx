@@ -1,4 +1,5 @@
 
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -7,61 +8,39 @@ import {
   Award,
 } from "lucide-react";
 
-const products = [
-  {
-    id: 5,
-    name: "Apple MacBook Pro",
-    category: "Laptops",
-    price: 185000,
-    rating: 4.9,
-    reviews: 128,
-    image:
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=85",
-    badge: "Top Rated",
-  },
-  {
-    id: 6,
-    name: "Premium Smartphone",
-    category: "Smartphones",
-    price: 89900,
-    rating: 4.8,
-    reviews: 96,
-    image:
-      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=85",
-    badge: "Popular",
-  },
-  {
-    id: 7,
-    name: "Wireless Gaming Headset",
-    category: "Gaming",
-    price: 7500,
-    rating: 4.7,
-    reviews: 84,
-    image:
-      "https://images.unsplash.com/photo-1599669454699-248893623440?auto=format&fit=crop&w=700&q=85",
-    badge: "Best Seller",
-  },
-  {
-    id: 8,
-    name: "Professional Digital Camera",
-    category: "Cameras",
-    price: 65000,
-    rating: 4.9,
-    reviews: 72,
-    image:
-      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=700&q=85",
-    badge: "Top Rated",
-  },
-];
+import { products } from "../data/products";
+
+const MAX_BEST_SELLING_PRODUCTS = 4;
 
 const formatPrice = (price) =>
-  `৳${Number(price).toLocaleString("en-BD")}`;
+  `৳${Number(price || 0).toLocaleString("en-BD")}`;
 
 const BestSelling = () => {
+  const bestSellingProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+
+    return products
+      .filter(
+        (product) =>
+          product.id !== undefined &&
+          product.id !== null &&
+          Number(product.price) > 0
+      )
+      .sort((a, b) => {
+        // Prioritize customer reviews, then rating.
+        const reviewDifference =
+          Number(b.reviews || 0) - Number(a.reviews || 0);
+
+        if (reviewDifference !== 0) return reviewDifference;
+
+        return Number(b.rating || 0) - Number(a.rating || 0);
+      })
+      .slice(0, MAX_BEST_SELLING_PRODUCTS);
+  }, []);
+
   return (
     <section className="bg-gray-50 py-14 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
         {/* Section Header */}
         <div className="mb-9 flex flex-col justify-between gap-5 sm:mb-10 sm:flex-row sm:items-end">
           <div className="max-w-2xl">
@@ -77,7 +56,8 @@ const BestSelling = () => {
 
             <p className="mt-3 max-w-xl text-sm leading-7 text-gray-500 sm:text-base">
               Discover our most popular electronics and gadgets,
-              selected for their quality, performance, and customer satisfaction.
+              selected for their quality, performance, and customer
+              satisfaction.
             </p>
           </div>
 
@@ -94,9 +74,9 @@ const BestSelling = () => {
         </div>
 
         {/* Product Grid */}
-        {products.length > 0 ? (
+        {bestSellingProducts.length > 0 ? (
           <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-            {products.map((product) => (
+            {bestSellingProducts.map((product) => (
               <article
                 key={product.id}
                 className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-gray-200/60"
@@ -121,15 +101,15 @@ const BestSelling = () => {
                   {/* Product Badge */}
                   <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white/95 px-3 py-1.5 text-[11px] font-bold text-gray-700 shadow-sm">
                     <Award size={13} className="text-blue-600" />
-                    {product.badge}
+                    {product.badge || "Popular"}
                   </span>
                 </div>
 
-                {/* Product Details */}
+                {/* Product Information */}
                 <div className="flex flex-1 flex-col p-4 sm:p-5">
                   {/* Category */}
                   <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                    {product.category}
+                    {product.category || "Electronics"}
                   </span>
 
                   {/* Product Name */}
@@ -151,12 +131,12 @@ const BestSelling = () => {
                         className="text-amber-500"
                       />
                       <span className="text-sm font-bold text-gray-800">
-                        {product.rating}
+                        {Number(product.rating || 0).toFixed(1)}
                       </span>
                     </div>
 
                     <span className="text-xs text-gray-400">
-                      ({product.reviews} reviews)
+                      ({product.reviews || 0} reviews)
                     </span>
                   </div>
 
@@ -169,6 +149,12 @@ const BestSelling = () => {
                     <p className="mt-1 text-xl font-extrabold tracking-tight text-gray-950">
                       {formatPrice(product.price)}
                     </p>
+
+                    {Number(product.oldPrice) > Number(product.price) && (
+                      <p className="mt-1 text-sm font-medium text-gray-400 line-through">
+                        {formatPrice(product.oldPrice)}
+                      </p>
+                    )}
                   </div>
 
                   {/* Product CTA */}
@@ -189,10 +175,7 @@ const BestSelling = () => {
         ) : (
           /* Empty State */
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-5 py-14 text-center">
-            <Award
-              size={32}
-              className="mx-auto text-gray-400"
-            />
+            <Award size={32} className="mx-auto text-gray-400" />
 
             <h3 className="mt-4 text-lg font-bold text-gray-900">
               No Products Available
@@ -217,7 +200,6 @@ const BestSelling = () => {
             />
           </Link>
         </div>
-
       </div>
     </section>
   );

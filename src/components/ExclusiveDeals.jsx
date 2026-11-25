@@ -1,4 +1,5 @@
 
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -11,95 +12,62 @@ import {
   BadgePercent,
 } from "lucide-react";
 
-const MIN_DEAL_DISCOUNT = 15;
+import { products } from "../data/products";
 
-const products = [
-  {
-    id: 1,
-    name: "Premium Wireless Headphones",
-    category: "Audio",
-    price: 4500,
-    oldPrice: 6000,
-    rating: 4.8,
-    reviews: 124,
-    image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=85",
-    badge: "Hot Deal",
-  },
-  {
-    id: 2,
-    name: "Modern Smart Watch",
-    category: "Wearables",
-    price: 3900,
-    oldPrice: 6500,
-    rating: 4.7,
-    reviews: 98,
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=85",
-    badge: "Big Saving",
-  },
-  {
-    id: 3,
-    name: "Mechanical Gaming Keyboard",
-    category: "Gaming",
-    price: 3000,
-    oldPrice: 5000,
-    rating: 4.9,
-    reviews: 156,
-    image:
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=700&q=85",
-    badge: "Best Deal",
-  },
-  {
-    id: 4,
-    name: "Professional Digital Camera",
-    category: "Photography",
-    price: 15400,
-    oldPrice: 22000,
-    rating: 4.8,
-    reviews: 76,
-    image:
-      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=700&q=85",
-    badge: "Limited Offer",
-  },
-];
+const MIN_DEAL_DISCOUNT = 15;
+const MAX_DEAL_PRODUCTS = 4;
 
 const formatPrice = (price) =>
-  `৳${Number(price).toLocaleString("en-BD")}`;
+  `৳${Number(price || 0).toLocaleString("en-BD")}`;
+
+const calculateDiscount = (price, oldPrice) => {
+  const currentPrice = Number(price);
+  const previousPrice = Number(oldPrice);
+
+  if (
+    !Number.isFinite(currentPrice) ||
+    !Number.isFinite(previousPrice) ||
+    currentPrice <= 0 ||
+    previousPrice <= currentPrice
+  ) {
+    return 0;
+  }
+
+  return Math.round(
+    ((previousPrice - currentPrice) / previousPrice) * 100
+  );
+};
 
 const ExclusiveDeals = () => {
-  // Keep only products with genuine and significant discounts.
-  const discountedProducts = products
-    .filter((product) => {
-      const price = Number(product.price);
-      const oldPrice = Number(product.oldPrice);
+  const discountedProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
 
-      if (
-        !Number.isFinite(price) ||
-        !Number.isFinite(oldPrice) ||
-        price <= 0 ||
-        oldPrice <= price
-      ) {
-        return false;
-      }
+    return products
+      .map((product) => {
+        const discount = calculateDiscount(
+          product.price,
+          product.oldPrice
+        );
 
-      const discount = ((oldPrice - price) / oldPrice) * 100;
-
-      return discount >= MIN_DEAL_DISCOUNT;
-    })
-    .map((product) => ({
-      ...product,
-      discount: Math.round(
-        ((product.oldPrice - product.price) / product.oldPrice) * 100
-      ),
-      savings: product.oldPrice - product.price,
-    }))
-    .sort((a, b) => b.discount - a.discount);
+        return {
+          ...product,
+          discount,
+          savings: Number(product.oldPrice) - Number(product.price),
+        };
+      })
+      .filter(
+        (product) =>
+          product.discount >= MIN_DEAL_DISCOUNT &&
+          product.id !== undefined &&
+          product.id !== null
+      )
+      .sort((a, b) => b.discount - a.discount)
+      .slice(0, MAX_DEAL_PRODUCTS);
+  }, []);
 
   return (
     <section className="bg-gray-50 py-14 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
         {/* Section Header */}
         <div className="mb-9 flex flex-col justify-between gap-5 sm:mb-10 sm:flex-row sm:items-end">
           <div className="max-w-2xl">
@@ -151,6 +119,9 @@ const ExclusiveDeals = () => {
                         alt={product.name}
                         loading="lazy"
                         className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                        onError={(event) => {
+                          event.currentTarget.style.visibility = "hidden";
+                        }}
                       />
                     </div>
                   </Link>
@@ -161,7 +132,7 @@ const ExclusiveDeals = () => {
                     {product.discount}% OFF
                   </span>
 
-                  {/* Wishlist */}
+                  {/* Wishlist UI */}
                   <button
                     type="button"
                     aria-label={`Add ${product.name} to wishlist`}
@@ -171,17 +142,17 @@ const ExclusiveDeals = () => {
                   </button>
 
                   {/* Product Badge */}
-                  <span className="absolute bottom-4 left-4 rounded-lg border border-gray-200 bg-white/95 px-3 py-1.5 text-[11px] font-bold text-gray-700 shadow-sm">
-                    {product.badge}
-                  </span>
+                  {product.badge && (
+                    <span className="absolute bottom-4 left-4 rounded-lg border border-gray-200 bg-white/95 px-3 py-1.5 text-[11px] font-bold text-gray-700 shadow-sm">
+                      {product.badge}
+                    </span>
+                  )}
                 </div>
 
-                {/* Product Details */}
+                {/* Product Information */}
                 <div className="flex flex-1 flex-col p-4 sm:p-5">
-
-                  {/* Category */}
                   <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                    {product.category}
+                    {product.category || "Electronics"}
                   </span>
 
                   {/* Product Name */}
@@ -203,12 +174,12 @@ const ExclusiveDeals = () => {
                         className="text-amber-500"
                       />
                       <span className="text-sm font-bold text-gray-800">
-                        {product.rating}
+                        {Number(product.rating || 0).toFixed(1)}
                       </span>
                     </div>
 
                     <span className="text-xs text-gray-400">
-                      ({product.reviews} reviews)
+                      ({product.reviews || 0} reviews)
                     </span>
                   </div>
 
@@ -230,7 +201,7 @@ const ExclusiveDeals = () => {
                     </div>
                   </div>
 
-                  {/* Product Button */}
+                  {/* Product Details Button */}
                   <Link
                     to={`/product/${product.id}`}
                     className="group/button mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
@@ -281,7 +252,6 @@ const ExclusiveDeals = () => {
             />
           </Link>
         </div>
-
       </div>
     </section>
   );

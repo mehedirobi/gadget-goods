@@ -151,6 +151,7 @@ const categories = [
 ];
 
 const quickLinks = [
+  { name: "Shop", path: "/shop", icon: ShoppingCart },
   { name: "Blog", path: "/blog", icon: BookOpen },
   { name: "Pre-orders", path: "/preorders", icon: Package },
   { name: "Offers", path: "/offers", icon: Tag },
